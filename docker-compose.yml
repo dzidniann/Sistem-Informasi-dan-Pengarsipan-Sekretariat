@@ -1,0 +1,92 @@
+version: "3.8"
+
+services:
+
+  # Aplikasi Laravel (PHP-FPM)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sim_kesekretariatan_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - sim_network
+    depends_on:
+      - db
+
+  # Web server yang menerima request dari browser
+  webserver:
+    image: nginx:stable-alpine
+    container_name: sim_kesekretariatan_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - sim_network
+    depends_on:
+      - app
+
+  # Database MySQL
+  db:
+    image: mysql:8.0
+    container_name: sim_kesekretariatan_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: sim_kesekretariatan
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: sim_user
+      MYSQL_PASSWORD: sim_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - sim_network
+
+  # phpMyAdmin, opsional, untuk lihat database lewat browser
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: sim_kesekretariatan_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8080:80"
+    networks:
+      - sim_network
+    depends_on:
+      - db
+
+  # Scheduler, jalanin tugas terjadwal seperti hapus log lama
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sim_kesekretariatan_scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - sim_network
+    depends_on:
+      - db
+    command: >
+      sh -c "while true; do php artisan schedule:run >> /dev/null 2>&1; sleep 60; done"
+
+networks:
+  sim_network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
