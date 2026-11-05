@@ -3,8 +3,7 @@
 @section('content')
     <div class="page-container">
 
-        <a href="{{ route('log-aktivitas.index') }}"
-           style="color:#64748b; font-size:0.9rem;">
+        <a href="{{ route('log-aktivitas.index') }}" style="color:#64748b; font-size:0.9rem;">
             &larr; Kembali ke daftar log
         </a>
 
@@ -35,132 +34,114 @@
                 $old = $properties['old'] ?? [];
             @endphp
 
-            @if($log->event === 'updated')
+            @if ($log->event === 'updated')
 
                 <h3 class="section-title" style="margin-bottom:12px;">
                     Detail Perubahan
                 </h3>
 
-                @if(count($attributes) > 0)
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Kolom</th>
-                                <th>Sebelum</th>
-                                <th>Sesudah</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach($attributes as $kolom => $nilaiBaru)
-
+                @if (count($attributes) > 0)
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <strong>
-                                            {{ str_replace('_', ' ', ucfirst($kolom)) }}
-                                        </strong>
-                                    </td>
-
-                                    <td style="background:#fef2f2; color:#b91c1c;">
-                                        {{ $old[$kolom] ?? '(kosong)' }}
-                                    </td>
-
-                                    <td style="background:#ecfdf5; color:#166534;">
-                                        {{ $nilaiBaru ?? '(kosong)' }}
-                                    </td>
+                                    <th>Kolom</th>
+                                    <th>Sebelum</th>
+                                    <th>Sesudah</th>
                                 </tr>
+                            </thead>
 
-                            @endforeach
-                        </tbody>
-                    </table>
+                            <tbody>
+                                @foreach ($attributes as $kolom => $nilaiBaru)
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                {{ str_replace('_', ' ', ucfirst($kolom)) }}
+                                            </strong>
+                                        </td>
 
+                                        <td style="background:#fef2f2; color:#b91c1c;">
+                                            {{ $old[$kolom] ?? '(kosong)' }}
+                                        </td>
+
+                                        <td style="background:#ecfdf5; color:#166534;">
+                                            {{ $nilaiBaru ?? '(kosong)' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 @else
-
                     <p class="section-meta">
                         Tidak ada rincian perubahan yang tercatat untuk aktivitas ini.
                     </p>
-
                 @endif
-
             @elseif($log->event === 'created')
-
                 <h3 class="section-title" style="margin-bottom:12px;">
                     Data yang Ditambahkan
                 </h3>
 
-                @if(count($attributes) > 0)
+                @if (count($attributes) > 0)
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <tbody>
 
-                    <table class="table">
-                        <tbody>
+                                @foreach ($attributes as $kolom => $nilai)
+                                    <tr>
+                                        <td style="width:200px;">
+                                            <strong>
+                                                {{ str_replace('_', ' ', ucfirst($kolom)) }}
+                                            </strong>
+                                        </td>
 
-                            @foreach($attributes as $kolom => $nilai)
+                                        <td>
+                                            {{ $nilai ?? '(kosong)' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
 
-                                <tr>
-                                    <td style="width:200px;">
-                                        <strong>
-                                            {{ str_replace('_', ' ', ucfirst($kolom)) }}
-                                        </strong>
-                                    </td>
-
-                                    <td>
-                                        {{ $nilai ?? '(kosong)' }}
-                                    </td>
-                                </tr>
-
-                            @endforeach
-
-                        </tbody>
-                    </table>
-
+                            </tbody>
+                        </table>
+                    </div>
                 @else
-
                     <p class="section-meta">
                         Tidak ada detail data yang tercatat.
                     </p>
-
                 @endif
-
             @elseif($log->event === 'deleted')
-
                 <h3 class="section-title" style="margin-bottom:12px;">
                     Data yang Dihapus
                 </h3>
 
-                @if(count($attributes) > 0)
+                @if (count($attributes) > 0)
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <tbody>
 
-                    <table class="table">
-                        <tbody>
+                                @foreach ($attributes as $kolom => $nilai)
+                                    <tr>
+                                        <td style="width:200px;">
+                                            <strong>
+                                                {{ str_replace('_', ' ', ucfirst($kolom)) }}
+                                            </strong>
+                                        </td>
 
-                            @foreach($attributes as $kolom => $nilai)
+                                        <td>
+                                            {{ $nilai ?? '(kosong)' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
 
-                                <tr>
-                                    <td style="width:200px;">
-                                        <strong>
-                                            {{ str_replace('_', ' ', ucfirst($kolom)) }}
-                                        </strong>
-                                    </td>
-
-                                    <td>
-                                        {{ $nilai ?? '(kosong)' }}
-                                    </td>
-                                </tr>
-
-                            @endforeach
-
-                        </tbody>
-                    </table>
-
+                            </tbody>
+                        </table>
+                    </div>
                 @else
-
                     <p class="section-meta">
                         Tidak ada detail data yang tercatat.
                     </p>
-
                 @endif
-
             @else
-
                 <p class="section-meta">
                     Tidak ada detail tambahan untuk jenis aktivitas ini.
                 </p>

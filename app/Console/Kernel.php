@@ -13,6 +13,11 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('log:reset')->monthlyOn(1, '01:00');
+        $schedule
+            ->command('legal:refresh-document-statuses')
+            ->dailyAt('00:00')
+            ->timezone(config('app.timezone'))
+            ->withoutOverlapping();
     }
 
     /**
@@ -20,7 +25,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

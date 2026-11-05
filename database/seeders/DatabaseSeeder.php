@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             BidangSeeder::class,
             UserSeeder::class,
+            LegalSeeder::class,
+            HumasSeeder::class,
         ]);
     }
 }

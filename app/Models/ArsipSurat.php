@@ -11,6 +11,7 @@ class ArsipSurat extends Model
     use LogsActivity;
 
     protected $table = 'arsip_surat';
+
     protected $primaryKey = 'id_surat';
 
     protected $fillable = [
@@ -67,18 +68,11 @@ class ArsipSurat extends Model
 
     public function kategori()
     {
-        return $this->belongsTo(
-            KategoriSurat::class,
-            'id_kategori',
-            'id_kategori'
-        );
+        return $this->belongsTo(KategoriSurat::class, 'id_kategori', 'id_kategori');
     }
 
     public function perilis()
     {
-        return $this->belongsTo(
-            User::class,
-            'dirilis_oleh'
-        );
+        return $this->belongsTo(User::class, 'dirilis_oleh');
     }
 }

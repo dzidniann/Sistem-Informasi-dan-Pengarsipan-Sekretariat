@@ -1,4 +1,10 @@
-@extends(auth()->user()->role->nama === 'sekretariat' ? 'sekretariat.layout' : 'staf.layout')
+@extends(
+    match (auth()->user()->role->nama) {
+        'sekretariat' => 'sekretariat.layout',
+        'humas' => 'humas.layout',
+        default => 'staf.layout'
+    }
+)
 
 @section('content')
     <div class="page-header">
@@ -7,9 +13,9 @@
     </div>
 
     <div class="card">
-        <div class="table-card" style="margin-bottom: 20px;">
+        <div style="margin-bottom: 20px;">
             <div class="table-wrapper" style="overflow: visible;">
-                <table class="table" style="min-width: auto; border: none;">
+                <table class="table detail-table" style="min-width: auto; border: none;">
                     <tbody>
                         <tr>
                             <th style="width: 200px; border-bottom: none;">Kategori</th>
@@ -21,7 +27,8 @@
                         </tr>
                         <tr>
                             <th style="border-bottom: none;">Tanggal Dokumen</th>
-                            <td style="border-bottom: none;">{{ \Carbon\Carbon::parse($arsip->tanggal)->format('d M Y') }}</td>
+                            <td style="border-bottom: none;">{{ \Carbon\Carbon::parse($arsip->tanggal)->format('d M Y') }}
+                            </td>
                         </tr>
                         <tr>
                             <th style="border-bottom: none;">Diunggah oleh</th>
@@ -37,7 +44,8 @@
         </div>
 
         <div style="display:flex; flex-wrap:wrap; gap: 12px; align-items:center;">
-            <a href="{{ Storage::url($arsip->file_path) }}" target="_blank" class="button button-primary">Buka / Unduh Berkas</a>
+            <a href="{{ Storage::url($arsip->file_path) }}" target="_blank" class="button button-primary">Buka / Unduh
+                Berkas</a>
             <a href="{{ route('arsip.index') }}" class="button button-secondary">Kembali ke daftar arsip</a>
         </div>
     </div>

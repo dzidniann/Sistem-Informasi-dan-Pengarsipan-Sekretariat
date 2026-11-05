@@ -7,7 +7,16 @@
 /storage/framework/sessions/*
 /storage/framework/views/*
 .env
+.env.*
+/tmp
+/storage/app/private-backups/
+/tools/qpdf
+/.vs
+/*.sql
+/*.sqlite
 .env.backup
 .phpunit.result.cache
 Dockerfile
 docker-compose.yml
+
+/.dist

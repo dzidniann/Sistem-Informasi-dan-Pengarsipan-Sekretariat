@@ -1,4 +1,6 @@
-FROM php:8.2-fpm
+FROM php:8.2.35-fpm
+
+COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
 
 # Install dependency sistem yang dibutuhkan extension PHP
 RUN apt-get update && apt-get install -y \
@@ -6,10 +8,13 @@ RUN apt-get update && apt-get install -y \
     curl \
     zip \
     unzip \
+    qpdf \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    libcurl4-openssl-dev \
+    libicu-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     default-mysql-client \
@@ -17,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install ekstensi PHP yang dipakai Laravel (termasuk GD untuk proses gambar/foto notulensi)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip curl intl
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

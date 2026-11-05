@@ -6,6 +6,7 @@
 /storage/*.key
 /vendor
 .env
+.env.docker
 .env.backup
 .env.production
 .phpunit.result.cache
@@ -17,3 +18,23 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+/tmp/mysql-recovery-backups/
+/tmp/humas-setup-backups/
+/tmp/pdfs/
+/tmp/code-format*/
+/tools/qpdf/
+
+/tmp/responsive-qa/
+/tmp/csr-template-work/
+
+# Local configuration, build workspaces, and temporary artifacts
+.env.*
+!.env.example
+!.env.docker.example
+/.dist/
+/tmp/
+/.vs/
+.DS_Store
+/cription
+/Activity__latest()-_first();

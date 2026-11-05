@@ -11,8 +11,10 @@ class CekAkunAktif
     {
         if (auth()->check() && !auth()->user()->is_active) {
             auth()->logout();
+
             return redirect('login')->with('error', 'Akun anda dinonaktifkan, hubungi admin untuk minta akses ya bub');
         }
+
         return $next($request);
     }
 }

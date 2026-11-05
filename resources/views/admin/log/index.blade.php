@@ -35,7 +35,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                
+
                 <div style="margin-top: 16px; display: flex; justify-content: center;">
                     {{ $logs->links('vendor.pagination.custom') }}
                 </div>

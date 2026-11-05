@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -112,4 +111,5 @@ return [
 
     'password_timeout' => 10800,
 
+    'allow_registration' => false,
 ];

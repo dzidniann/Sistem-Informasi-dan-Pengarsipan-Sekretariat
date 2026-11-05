@@ -15,21 +15,11 @@ class ResetActivityLog extends Command
     {
         $batasWaktu = now()->subMonths(2);
 
-        $jumlahDihapus = Activity::where(
-            'created_at',
-            '<',
-            $batasWaktu
-        )->count();
+        $jumlahDihapus = Activity::where('created_at', '<', $batasWaktu)->count();
 
-        Activity::where(
-            'created_at',
-            '<',
-            $batasWaktu
-        )->delete();
+        Activity::where('created_at', '<', $batasWaktu)->delete();
 
-        $this->info(
-            "Berhasil menghapus {$jumlahDihapus} log aktivitas yang lebih lama dari 2 bulan."
-        );
+        $this->info("Berhasil menghapus {$jumlahDihapus} log aktivitas yang lebih lama dari 2 bulan.");
 
         return self::SUCCESS;
     }
