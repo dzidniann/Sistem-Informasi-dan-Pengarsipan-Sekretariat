@@ -24,9 +24,7 @@ class Role extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly([
-                'nama',
-            ])
+            ->logOnly(['nama'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }

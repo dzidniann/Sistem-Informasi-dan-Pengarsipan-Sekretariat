@@ -13,9 +13,13 @@ class RoleMiddleware
             return redirect('/login');
         }
 
-        if (auth()->user()->role->nama !== $role) {
-    abort(403);
-}
+        // Support multiple roles separated by comma
+        // Contoh: role:legal-admin,employee
+        $roles = explode(',', $role);
+
+        if (!in_array(auth()->user()->role->nama, $roles)) {
+            abort(403);
+        }
 
         return $next($request);
     }

@@ -3,15 +3,13 @@
 @section('content')
     <div class="page-container">
 
-        <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #2a5298 100%); color: white; border-radius: 12px; padding: 30px; margin-bottom: 24px;">
+        <div class="card"
+            style="background: linear-gradient(135deg, #0f172a 0%, #2a5298 100%); color: white; border-radius: 12px; padding: 30px; margin-bottom: 24px;">
             <div style="display: flex; align-items: center; gap: 20px;">
 
-                <div style="width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 10px; flex-shrink: 0;">
-                    <img
-                        src="{{ asset('images/logo.png') }}"
-                        alt="Logo"
-                        style="width: 100%; height: auto;"
-                    >
+                <div
+                    style="width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 10px; flex-shrink: 0;">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" style="width: 100%; height: auto;">
                 </div>
 
                 <div>
@@ -81,9 +79,7 @@
 
             <div class="stat-grid">
 
-                <a href="{{ route('kategori-surat.index') }}"
-                   class="category-card"
-                   style="display:block;">
+                <a href="{{ route('kategori-surat.index') }}" class="category-card" style="display:block;">
 
                     <p class="category-title" style="margin:0 0 4px;">
                         Kategori Surat
@@ -96,9 +92,7 @@
                 </a>
 
 
-                <a href="{{ route('bidang.index') }}"
-                   class="category-card"
-                   style="display:block;">
+                <a href="{{ route('bidang.index') }}" class="category-card" style="display:block;">
 
                     <p class="category-title" style="margin:0 0 4px;">
                         Bidang
@@ -111,9 +105,7 @@
                 </a>
 
 
-                <a href="{{ route('kategori-arsip.index') }}"
-                   class="category-card"
-                   style="display:block;">
+                <a href="{{ route('kategori-arsip.index') }}" class="category-card" style="display:block;">
 
                     <p class="category-title" style="margin:0 0 4px;">
                         Kategori Arsip
@@ -126,9 +118,7 @@
                 </a>
 
 
-                <a href="{{ route('role.index') }}"
-                   class="category-card"
-                   style="display:block;">
+                <a href="{{ route('role.index') }}" class="category-card" style="display:block;">
 
                     <p class="category-title" style="margin:0 0 4px;">
                         Role
@@ -141,9 +131,7 @@
                 </a>
 
 
-                <a href="{{ route('pengguna.index') }}"
-                   class="category-card"
-                   style="display:block;">
+                <a href="{{ route('pengguna.index') }}" class="category-card" style="display:block;">
 
                     <p class="category-title" style="margin:0 0 4px;">
                         Pengguna
@@ -154,9 +142,7 @@
                     </p>
                 </a>
 
-                <a href="{{ route('log-aktivitas.index') }}"
-                    class="category-card"
-                    style="display:block;">
+                <a href="{{ route('log-aktivitas.index') }}" class="category-card" style="display:block;">
 
                     <p class="category-title" style="margin:0 0 4px;">
                         Log Aktivitas
@@ -179,11 +165,8 @@
                     Aktivitas Terbaru
                 </h3>
 
-                <a
-                    href="{{ route('log-aktivitas.index') }}"
-                    class="button button-secondary"
-                    style="padding:8px 14px; font-size:0.85rem;"
-                >
+                <a href="{{ route('log-aktivitas.index') }}" class="button button-secondary"
+                    style="padding:8px 14px; font-size:0.85rem;">
                     Lihat semua
                 </a>
 
@@ -191,8 +174,8 @@
 
 
             @forelse($aktivitasTerbaru as $log)
-
-                <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #d8c38f; font-size:0.95rem;">
+                <div
+                    style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #d8c38f; font-size:0.95rem;">
 
                     <span>
 
@@ -206,7 +189,7 @@
                             {{ ucfirst($log->description) }}
                         </span>
 
-                        @if($log->subject_type)
+                        @if ($log->subject_type)
                             pada
                             <strong>
                                 {{ class_basename($log->subject_type) }}
@@ -226,7 +209,6 @@
                 <p class="section-meta">
                     Belum ada aktivitas tercatat.
                 </p>
-
             @endforelse
 
         </div>

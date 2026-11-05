@@ -34,8 +34,13 @@ class ActivityLog extends Model
      * $dataLama: array data sebelum diubah (khusus edit)
      * $dataBaru: array data setelah ditambah/diubah
      */
-    public static function catat(string $action, ?string $modelType = null, ?int $modelId = null, ?array $dataLama = null, ?array $dataBaru = null): void
-    {
+    public static function catat(
+        string $action,
+        ?string $modelType = null,
+        ?int $modelId = null,
+        ?array $dataLama = null,
+        ?array $dataBaru = null,
+    ): void {
         static::create([
             'action' => $action,
             'model_type' => $modelType,

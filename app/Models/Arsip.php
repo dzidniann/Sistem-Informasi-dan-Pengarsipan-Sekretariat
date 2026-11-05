@@ -11,23 +11,19 @@ class Arsip extends Model
 {
     use HasFactory, LogsActivity;
 
-    protected $fillable = [
-        'judul_file',
-        'tanggal',
-        'file_path',
-        'kategori_id',
-        'bidang_id',
-        'uploaded_by',
-    ];
+    protected $fillable = ['judul_file', 'tanggal', 'file_path', 'kategori_id', 'bidang_id', 'uploaded_by'];
 
     /**
      * Konfigurasi Activity Log Spatie
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()
-            ->logFillable()
-            ->logOnlyDirty();
+        return LogOptions::defaults()->logFillable()->logOnlyDirty();
+    }
+
+    public function scopeVisibleTo($query, User $user)
+    {
+        return $user->bisaAksesSemuaBidang() ? $query : $query->where('bidang_id', $user->bidang_id);
     }
 
     public function kategori()

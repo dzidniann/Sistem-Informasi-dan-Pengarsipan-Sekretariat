@@ -24,12 +24,17 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        return redirect()->intended(match ($user->role->nama) {
-            'super-admin' => route('dashboard.admin'),
-            'sekretariat' => route('dashboard.sekretariat'),
-            'staf-bidang' => route('dashboard.staf'),
-            default => route('login'),
-        });
+        return redirect()->intended(
+            match ($user->role->nama ?? '') {
+                'super-admin' => route('dashboard.admin'),
+                'sekretariat' => route('dashboard.sekretariat'),
+                'staf-bidang' => route('dashboard.staf'),
+                'legal-admin' => route('legal.dashboard'),
+                'humas' => route('humas.dashboard'),
+                'employee' => route('employee.consultations.index'),
+                default => route('login'),
+            },
+        );
     }
 
     public function destroy(Request $request): RedirectResponse

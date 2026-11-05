@@ -23,13 +23,10 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
-        return view('admin.dashboard', compact(
-            'totalPengguna',
-            'totalBidang',
-            'totalKategori',
-            'totalArsip',
-            'aktivitasTerbaru'
-        ));
+        return view(
+            'admin.dashboard',
+            compact('totalPengguna', 'totalBidang', 'totalKategori', 'totalArsip', 'aktivitasTerbaru'),
+        );
     }
 
     public function sekretariat()
@@ -43,17 +40,13 @@ class DashboardController extends Controller
 
             $bulanData[] = [
                 'label' => $bulan->translatedFormat('M Y'),
-                'total' => Arsip::whereBetween(
-                    'created_at',
-                    [$awal, $akhir]
-                )->count(),
+                'total' => Arsip::visibleTo(auth()->user())
+                    ->whereBetween('created_at', [$awal, $akhir])
+                    ->count(),
             ];
         }
 
-        return view(
-            'sekretariat.dashboard',
-            compact('bulanData')
-        );
+        return view('sekretariat.dashboard', compact('bulanData'));
     }
 
     public function staf()
@@ -63,25 +56,19 @@ class DashboardController extends Controller
 
     public function rekapBulanan(Request $request)
     {
+        $request->validate([
+            'bulan' => 'nullable|integer|between:1,12',
+            'tahun' => 'nullable|integer|between:1900,2100',
+        ]);
         $bulan = $request->bulan ?? now()->month;
         $tahun = $request->tahun ?? now()->year;
 
-        $awal = \Carbon\Carbon::create(
-            $tahun,
-            $bulan,
-            1
-        )->startOfMonth();
+        $awal = \Carbon\Carbon::create($tahun, $bulan, 1)->startOfMonth();
 
-        $akhir = \Carbon\Carbon::create(
-            $tahun,
-            $bulan,
-            1
-        )->endOfMonth();
+        $akhir = \Carbon\Carbon::create($tahun, $bulan, 1)->endOfMonth();
 
-        $rekap = Arsip::whereBetween(
-            'created_at',
-            [$awal, $akhir]
-        )
+        $rekap = Arsip::visibleTo($request->user())
+            ->whereBetween('created_at', [$awal, $akhir])
             ->with('bidang')
             ->get()
             ->groupBy('bidang_id')
@@ -94,9 +81,7 @@ class DashboardController extends Controller
             ->values();
 
         return response()->json([
-            'namaBulan' => \Carbon\Carbon::create()
-                ->month($bulan)
-                ->translatedFormat('F'),
+            'namaBulan' => \Carbon\Carbon::create()->month($bulan)->translatedFormat('F'),
 
             'tahun' => $tahun,
 

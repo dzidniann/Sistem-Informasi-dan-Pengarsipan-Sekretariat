@@ -19,7 +19,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($roles as $r)
+                        @foreach ($roles as $r)
                             <tr>
                                 <td>{{ $r->nama }}</td>
                                 <td>{{ $r->users_count }}</td>

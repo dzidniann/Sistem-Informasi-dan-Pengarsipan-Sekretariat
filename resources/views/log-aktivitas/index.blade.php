@@ -6,20 +6,15 @@
             <div class="page-header">
                 <h2 class="page-title">Log Aktivitas</h2>
                 <p class="page-subtitle">
-                    Riwayat aktivitas seluruh pengguna.
+                    {{ auth()->user()->role->nama === 'super-admin' ? 'Riwayat aktivitas seluruh pengguna.' : 'Riwayat aktivitas akun Anda sendiri.' }}
                 </p>
             </div>
         </div>
 
         <div class="table-card">
             <form method="GET" action="{{ route('log-aktivitas.index') }}" class="search-group" style="margin-bottom:14px;">
-                <input
-                    type="text"
-                    name="cari"
-                    placeholder="Cari aksi, jenis data, atau nama pengguna"
-                    value="{{ request('cari') }}"
-                    class="form-control"
-                >
+                <input type="text" name="cari" placeholder="Cari aksi, jenis data, atau nama pengguna"
+                    value="{{ request('cari') }}" class="form-control">
 
                 <button type="submit" class="button button-primary button-search">
                     Cari
@@ -39,10 +34,7 @@
 
                     <tbody>
                         @forelse($logs as $log)
-                            <tr
-                                style="cursor:pointer;"
-                                onclick="window.location='{{ route('log-aktivitas.show', $log) }}'"
-                            >
+                            <tr style="cursor:pointer;" onclick="window.location='{{ route('log-aktivitas.show', $log) }}'">
                                 <td>
                                     {{ $log->created_at->format('d M Y, H:i') }}
                                 </td>
@@ -61,10 +53,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td
-                                    colspan="4"
-                                    style="text-align:center; color:#94a3b8;"
-                                >
+                                <td colspan="4" style="text-align:center; color:#94a3b8;">
                                     Belum ada aktivitas tercatat
                                 </td>
                             </tr>

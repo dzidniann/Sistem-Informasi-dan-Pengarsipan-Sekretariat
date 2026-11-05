@@ -10,26 +10,29 @@ class BidangController extends Controller
     public function index()
     {
         $bidang = Bidang::withCount(['users', 'kategoriArsip'])->get();
+
         return view('admin.bidang.index', compact('bidang'));
     }
 
-public function store(Request $request)
-{
-    $request->validate([
-    'nama_bidang' => 'required|string|max:100|unique:bidangs',
-    'akses_semua_bidang' => 'nullable|boolean',
-], [
-    'nama_bidang.unique' => 'Nama bidang ini sudah terdaftar, gunakan nama lain.',
-]);
+    public function store(Request $request)
+    {
+        $request->validate(
+            [
+                'nama_bidang' => 'required|string|max:100|unique:bidangs',
+                'akses_semua_bidang' => 'nullable|boolean',
+            ],
+            [
+                'nama_bidang.unique' => 'Nama bidang ini sudah terdaftar, gunakan nama lain.',
+            ],
+        );
 
-    $bidang = Bidang::create([
-        'nama_bidang' => $request->nama_bidang,
-        'akses_semua_bidang' => $request->boolean('akses_semua_bidang'),
-    ]);
+        $bidang = Bidang::create([
+            'nama_bidang' => $request->nama_bidang,
+            'akses_semua_bidang' => $request->boolean('akses_semua_bidang'),
+        ]);
 
-
-    return back()->with('success', 'Bidang berhasil ditambahkan');
-}
+        return back()->with('success', 'Bidang berhasil ditambahkan');
+    }
 
     public function update(Request $request, Bidang $bidang)
     {
@@ -43,7 +46,7 @@ public function store(Request $request)
             'nama_bidang' => $request->nama_bidang,
             'akses_semua_bidang' => $request->boolean('akses_semua_bidang'),
         ]);
-        
+
         return back()->with('success', 'Bidang berhasil diperbarui');
     }
 
@@ -53,8 +56,8 @@ public function store(Request $request)
             return back()->with('error', 'Bidang masih memiliki data terkait, tidak bisa dihapus');
         }
 
-    
         $bidang->delete();
+
         return back()->with('success', 'Bidang berhasil dihapus');
     }
 }

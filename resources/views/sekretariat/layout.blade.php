@@ -1,254 +1,570 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sekretariat - Sistem Kesekretariatan</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        :root {
-            color-scheme: light;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            color: #0f172a;
-            background: #f8fafc;
-        }
-        * { box-sizing: border-box; }
-        body { margin: 0; min-height: 100vh; background: #f8fafc; color: #0f172a; }
-        a { color: inherit; text-decoration: none; }
-        button, input, select { font: inherit; }
-        .app-shell { display: flex; min-height: 100vh; }
-        .sidebar { width: 260px; min-width: 260px; background: #172033; color: #f8fafc; border-right: 3px solid #0f766e; }
-        .sidebar-inner { padding: 28px 20px; display: flex; flex-direction: column; gap: 18px; }
-        .sidebar-title { margin: 0 0 12px; font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }
-        .nav-link { display: block; width: 100%; padding: 12px 16px; border: 1px solid transparent; border-radius: 16px; color: #d9f5f0; margin-bottom: 6px; transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease; }
-        .nav-link:hover { background: #19433f; border-color: #4da99f; transform: translateX(2px); }
-        .nav-link.active { background: #1d625b; border-color: #7bd1c6; color: #fff; }
-        .sidebar-footer { margin-top: auto; padding-top: 12px; border-top: 1px solid #4da99f; }
-        .main-content { flex: 1; padding: 30px 26px; }
-        .page-container { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
-        .page-header { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-        .page-title { margin: 0; font-size: 28px; font-weight: 700; color: #0f172a; }
-        .page-subtitle { margin: 0; color: #475569; line-height: 1.6; }
-        .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center; padding-bottom: 18px; border-bottom: 2px solid #8bcfc5; }
-        .user-badge { display: inline-flex; align-items: center; gap: 10px; background: #e6f7f4; border: 1px solid #9ed8d0; color: #115e59; padding: 10px 14px; border-radius: 999px; font-size: 0.95rem; }
-        .card { background: #fff; border: 1px solid #9ed8d0; border-radius: 26px; box-shadow: 0 18px 45px rgba(15, 23, 42, 0.05); padding: 26px; }
-        .card-sm { padding: 20px; }
-        .table-card { background: #fff; border: 1px solid #b8d6f5; border-radius: 22px; padding: 24px; }
-        .table-wrapper { overflow-x: auto; }
-        .table { width: 100%; border-collapse: collapse; min-width: 680px; }
-        .table th,
-        .table td { padding: 16px 18px; text-align: left; border-bottom: 1px solid #d5e2f0; }
-        .table th { color: #0f172a; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.01em; }
-        .table td { color: #475569; font-size: 0.95rem; }
-        .table tbody tr:hover { background: #f8fafc; }
-        .table td .button { padding: 10px 16px; border-radius: 999px; }
-        .hidden { display: none; }
-        .form-label { display: block; margin-bottom: 10px; color: #334155; font-size: 0.95rem; font-weight: 600; }
-        .form-control { width: 100%; border: 1px solid #8bcfc5; border-radius: 18px; padding: 14px 15px; background: #fbfffe; color: #0f172a; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-        .form-control:focus { border-color: #0f766e; box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.14); }
-        input[type="text"], input[type="email"], input[type="password"], input[type="date"], input[type="number"], input[type="month"], select, textarea { width: 100%; border: 1px solid #8bcfc5; border-radius: 18px; padding: 14px 15px; background: #fbfffe; color: #0f172a; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="date"]:focus, input[type="number"]:focus, input[type="month"]:focus, select:focus, textarea:focus { border-color: #64748b; box-shadow: 0 0 0 4px rgba(100, 116, 139, 0.12); }
-        table { width: 100%; border-collapse: collapse; min-width: 680px; background: #fff; }
-        th, td { padding: 16px 18px; text-align: left; border-bottom: 1px solid #d5e2f0; }
-        th { color: #0f172a; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.01em; }
-        td { color: #475569; font-size: 0.95rem; }
-        tbody tr:hover { background: #f8fafc; }
-        button, .button { border: none; border-radius: 999px; padding: 13px 20px; cursor: pointer; font-weight: 700; letter-spacing: 0.01em; transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease; box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08); min-width: 130px; }
-        button:hover, .button:hover { transform: translateY(-1px); }
-        .button-primary { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; }
-        .button-primary:active { transform: translateY(1px); }
-        .button-danger { background: #dc2626; color: #fff; }
-        .button-danger:hover { background: #b91c1c; }
-        .button-secondary { background: #e6f7f4; color: #115e59; border: 1px solid #9ed8d0; }
-        .button-secondary:hover { background: #d2f0eb; }
-        .button-search { min-width: 132px; }
-        .search-group { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; width: 100%; margin-top: 14px; }
-        .search-group .form-control { flex: 1; min-width: 260px; }
-        .chart-card { background: #fff; border: 1px solid #d8c38f; border-radius: 28px; padding: 24px; box-shadow: 0 18px 45px rgba(15, 23, 42, 0.05); }
-        .chart-card canvas { width: 100% !important; max-height: 420px; height: auto !important; display: block; }
-        @media (max-width: 980px) {
-            .app-shell { flex-direction: column; }
-            .sidebar { width: 100%; min-width: 100%; }
-            .main-content { padding: 22px 18px; }
-        }
-        @media (max-width: 640px) {
-            .sidebar-inner { padding: 18px 16px; }
-            .main-content { padding: 18px 14px; }
-            .page-container { gap: 18px; }
-        }
-        .sidebar-toggle {
-        display: none;
-        position: fixed;
-        top: 16px;
-        left: 16px;
-        z-index: 60;
-        background: #0f172a;
-        color: #f8fafc;
-        border: none;
-        border-radius: 12px;
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        font-size: 20px;
-        cursor: pointer;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.15);
-    }
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.5);
-        z-index: 39;
-    }
-    .sidebar {
-        transition: transform 0.25s ease, width 0.25s ease;
-    }
 
-    /* Desktop: tombol lipat sidebar */
-    @media (min-width: 981px) {
-        .sidebar-toggle { display: flex; }
-        .app-shell.sidebar-collapsed .sidebar {
-            width: 0;
-            min-width: 0;
-            overflow: hidden;
-            border-right: none;
-        }
-    }
+    <head>
+        @include('layouts.favicon')
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sekretariat - Sistem Kesekretariatan</title>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <style>
+            :root {
+                color-scheme: light;
+                font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                color: #0f172a;
+                background: #f8fafc;
+            }
 
-        /* Mobile: sidebar default tersembunyi, hanya tombol burger yang tampil */
-        @media (max-width: 980px) {
-            .sidebar-toggle { display: flex; }
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                background: #f8fafc;
+                color: #0f172a;
+            }
+
+            a {
+                color: inherit;
+                text-decoration: none;
+            }
+
+            button,
+            input,
+            select {
+                font: inherit;
+            }
+
+            .app-shell {
+                display: flex;
+                min-height: 100vh;
+            }
+
             .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                z-index: 40;
-                transform: translateX(-100%);
+                width: 260px;
+                min-width: 260px;
+                background: #172033;
+                color: #f8fafc;
+                border-right: 3px solid #0f766e;
             }
-            .app-shell.sidebar-open .sidebar {
-                transform: translateX(0);
+
+            .sidebar-inner {
+                padding: 28px 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
             }
-            .app-shell.sidebar-open .sidebar-overlay {
+
+            .sidebar-title {
+                margin: 0 0 12px;
+                font-size: 0.95rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: #94a3b8;
+            }
+
+            .nav-link {
+                display: block;
+                width: 100%;
+                padding: 12px 16px;
+                border: 1px solid transparent;
+                border-radius: 16px;
+                color: #d9f5f0;
+                margin-bottom: 6px;
+                transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+            }
+
+            .nav-link:hover {
+                background: #19433f;
+                border-color: #4da99f;
+                transform: translateX(2px);
+            }
+
+            .nav-link.active {
+                background: #1d625b;
+                border-color: #7bd1c6;
+                color: #fff;
+            }
+
+            .sidebar-footer {
+                margin-top: auto;
+                padding-top: 12px;
+                border-top: 1px solid #4da99f;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 30px 26px;
+            }
+
+            .page-container {
+                max-width: 1180px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .page-header {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+
+            .page-title {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 700;
+                color: #0f172a;
+            }
+
+            .page-subtitle {
+                margin: 0;
+                color: #475569;
+                line-height: 1.6;
+            }
+
+            .topbar {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 12px;
+                align-items: center;
+                padding-bottom: 18px;
+                border-bottom: 2px solid #8bcfc5;
+            }
+
+            .user-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                background: #e6f7f4;
+                border: 1px solid #9ed8d0;
+                color: #115e59;
+                padding: 10px 14px;
+                border-radius: 999px;
+                font-size: 0.95rem;
+            }
+
+            .card {
+                background: #fff;
+                border: 1px solid #9ed8d0;
+                border-radius: 26px;
+                box-shadow: 0 18px 45px rgba(15, 23, 42, 0.05);
+                padding: 26px;
+            }
+
+            .card-sm {
+                padding: 20px;
+            }
+
+            .table-card {
+                background: #fff;
+                border: 1px solid #b8d6f5;
+                border-radius: 22px;
+                padding: 24px;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+                min-width: 680px;
+            }
+
+            .table th,
+            .table td {
+                padding: 16px 18px;
+                text-align: left;
+                border-bottom: 1px solid #d5e2f0;
+            }
+
+            .table th {
+                color: #0f172a;
+                font-weight: 700;
+                font-size: 0.95rem;
+                letter-spacing: 0.01em;
+            }
+
+            .table td {
+                color: #475569;
+                font-size: 0.95rem;
+            }
+
+            .table tbody tr:hover {
+                background: #f8fafc;
+            }
+
+            .table td .button {
+                padding: 10px 16px;
+                border-radius: 999px;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            .form-label {
+                display: block;
+                margin-bottom: 10px;
+                color: #334155;
+                font-size: 0.95rem;
+                font-weight: 600;
+            }
+
+            .form-control {
+                width: 100%;
+                border: 1px solid #8bcfc5;
+                border-radius: 18px;
+                padding: 14px 15px;
+                background: #fbfffe;
+                color: #0f172a;
+                outline: none;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .form-control:focus {
+                border-color: #0f766e;
+                box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.14);
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="date"],
+            input[type="number"],
+            input[type="month"],
+            select,
+            textarea {
+                width: 100%;
+                border: 1px solid #8bcfc5;
+                border-radius: 18px;
+                padding: 14px 15px;
+                background: #fbfffe;
+                color: #0f172a;
+                outline: none;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            input[type="text"]:focus,
+            input[type="email"]:focus,
+            input[type="password"]:focus,
+            input[type="date"]:focus,
+            input[type="number"]:focus,
+            input[type="month"]:focus,
+            select:focus,
+            textarea:focus {
+                border-color: #64748b;
+                box-shadow: 0 0 0 4px rgba(100, 116, 139, 0.12);
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                min-width: 680px;
+                background: #fff;
+            }
+
+            th,
+            td {
+                padding: 16px 18px;
+                text-align: left;
+                border-bottom: 1px solid #d5e2f0;
+            }
+
+            th {
+                color: #0f172a;
+                font-weight: 700;
+                font-size: 0.95rem;
+                letter-spacing: 0.01em;
+            }
+
+            td {
+                color: #475569;
+                font-size: 0.95rem;
+            }
+
+            tbody tr:hover {
+                background: #f8fafc;
+            }
+
+            button,
+            .button {
+                border: none;
+                border-radius: 999px;
+                padding: 13px 20px;
+                cursor: pointer;
+                font-weight: 700;
+                letter-spacing: 0.01em;
+                transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+                box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+                min-width: 130px;
+            }
+
+            button:hover,
+            .button:hover {
+                transform: translateY(-1px);
+            }
+
+            .button-primary {
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                color: #fff;
+            }
+
+            .button-primary:active {
+                transform: translateY(1px);
+            }
+
+            .button-danger {
+                background: #dc2626;
+                color: #fff;
+            }
+
+            .button-danger:hover {
+                background: #b91c1c;
+            }
+
+            .button-secondary {
+                background: #e6f7f4;
+                color: #115e59;
+                border: 1px solid #9ed8d0;
+            }
+
+            .button-secondary:hover {
+                background: #d2f0eb;
+            }
+
+            .button-search {
+                min-width: 132px;
+            }
+
+            .search-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: center;
+                width: 100%;
+                margin-top: 14px;
+            }
+
+            .search-group .form-control {
+                flex: 1;
+                min-width: 260px;
+            }
+
+            .chart-card {
+                background: #fff;
+                border: 1px solid #d8c38f;
+                border-radius: 28px;
+                padding: 24px;
+                box-shadow: 0 18px 45px rgba(15, 23, 42, 0.05);
+            }
+
+            .chart-card canvas {
+                width: 100% !important;
+                max-height: 420px;
+                height: auto !important;
                 display: block;
             }
-            .main-content {
-                padding-top: 78px;
-            }
-        }
-            .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-        }
-        @media (max-width: 900px) {
-            .stat-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 560px) {
-            .stat-grid {
-                grid-template-columns: 1fr;
-            }
-            
-        }
-.category-card {
-    background: #f8fafc;
-    border: 1px solid #d8c38f;
-    border-radius: 22px;
-    padding: 22px;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-}
-.category-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
-    border-color: #b45309;
-}
-.category-title {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #0f172a;
-}
-.section-title {
-    margin: 0 0 8px;
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #0f172a;
-}
-.section-meta {
-    margin: 0;
-    color: #64748b;
-    font-size: 0.95rem;
-}
-    </style>
-</head>
-<body>
-    <div class="app-shell" id="appShell">
-        <button type="button" class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">&#9776;</button>
-        <div class="sidebar-overlay" onclick="closesSidebarMobile()"></div>
 
-        <aside class="sidebar">
-            <div class="sidebar-inner">
-            <div class="sidebar-inner">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom: 8px;">
-                <img src="{{ asset('images/logo-icon-badge.png') }}" alt="Logo" style="height: 40px;">
-                <p class="sidebar-title" style="margin:0;">Sekretariat Navigation</p>
-            </div>
-                <a href="{{ route('dashboard.sekretariat') }}" class="nav-link {{ Request::routeIs('dashboard.sekretariat') ? 'active' : '' }}">Dashboard</a>
-                <a href="{{ route('arsip.index') }}" class="nav-link {{ Request::routeIs('arsip.*') ? 'active' : '' }}">Upload Berkas</a>
-                <a href="{{ route('nomor-surat.index') }}" class="nav-link {{ request()->routeIs('nomor-surat.*') ? 'active' : '' }}">Perilisan Nomor</a>
-                <a href="{{ route('notulensi.index') }}" class="nav-link {{ Request::routeIs('notulensi.*') ? 'active' : '' }}">Notulensi</a>
-                <a href="{{ route('arsip.index') }}#daftar-arsip" class="nav-link {{ Request::routeIs('arsip.*') && !request('cakupan') ? 'active' : '' }}">
-                    Arsip Semua Bidang
-                </a>
-                <a href="{{ route('arsip.index', ['cakupan' => 'sendiri']) }}#daftar-arsip" class="nav-link {{ request('cakupan') === 'sendiri' ? 'active' : '' }}">
-                    Arsip Sekretariat
-                </a>
-                <a href="{{ route('laporan.index') }}" class="nav-link {{ Request::routeIs('laporan.*') ? 'active' : '' }}">Laporan Bulanan</a>
-                <a href="{{ route('log-aktivitas.index') }}" class="nav-link {{ Request::routeIs('log-aktivitas.*') ? 'active' : '' }}">Log Aktivitas</a>
-                <div class="sidebar-footer">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="button button-secondary" style="width:100%;">Logout</button>
-                    </form>
-                </div>
-            </div>
-        </aside>
-        <main class="main-content">
-            <div class="page-container">
-                <div class="topbar">
-                    <div class="page-header">
-                        <p class="page-subtitle">Sekretariat & Pengarsipan</p>
-                        <h1 class="page-title">{{ auth()->user()->name }}</h1>
+            @media (max-width: 980px) {
+                .app-shell {
+                    flex-direction: column;
+                }
+
+                .sidebar {
+                    width: 100%;
+                    min-width: 100%;
+                }
+
+                .main-content {
+                    padding: 22px 18px;
+                }
+            }
+
+            @media (max-width: 640px) {
+                .sidebar-inner {
+                    padding: 18px 16px;
+                }
+
+                .main-content {
+                    padding: 18px 14px;
+                }
+
+                .page-container {
+                    gap: 18px;
+                }
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.5);
+                z-index: 39;
+            }
+
+            .sidebar {
+                transition: transform 0.25s ease, width 0.25s ease;
+            }
+
+            /* Desktop: tombol lipat sidebar */
+            @media (min-width: 981px) {
+                .sidebar-toggle {
+                    display: flex;
+                }
+
+                .app-shell.sidebar-collapsed .sidebar {
+                    width: 0;
+                    min-width: 0;
+                    overflow: hidden;
+                    border-right: none;
+                }
+            }
+
+            /* Mobile: sidebar default tersembunyi, hanya tombol burger yang tampil */
+            @media (max-width: 980px) {
+                .sidebar-toggle {
+                    display: flex;
+                }
+
+                .sidebar {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    height: 100vh;
+                    z-index: 40;
+                    transform: translateX(-100%);
+                }
+
+                .app-shell.sidebar-open .sidebar {
+                    transform: translateX(0);
+                }
+
+                .app-shell.sidebar-open .sidebar-overlay {
+                    display: block;
+                }
+
+                .main-content {
+                    padding-top: 78px;
+                }
+            }
+
+            .stat-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+            }
+
+            @media (max-width: 900px) {
+                .stat-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 560px) {
+                .stat-grid {
+                    grid-template-columns: 1fr;
+                }
+
+            }
+
+            .category-card {
+                background: #f8fafc;
+                border: 1px solid #d8c38f;
+                border-radius: 22px;
+                padding: 22px;
+                transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            }
+
+            .category-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+                border-color: #b45309;
+            }
+
+            .category-title {
+                margin: 0;
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #0f172a;
+            }
+
+            .section-title {
+                margin: 0 0 8px;
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: #0f172a;
+            }
+
+            .section-meta {
+                margin: 0;
+                color: #64748b;
+                font-size: 0.95rem;
+            }
+        </style>
+        @include('layouts.sidebar-controls-style')
+        @include('layouts.responsive-style')
+    </head>
+
+    <body>
+        <div class="app-shell" id="appShell">
+            <div class="sidebar-overlay" onclick="closeSidebarMobile()"></div>
+
+            <aside class="sidebar">
+                <div class="sidebar-inner">
+                    <button type="button" class="sidebar-close" onclick="closeSidebarMobile()"
+                        aria-label="Tutup menu">Tutup <x-ui-icon name="close" width="16"
+                            height="16" /></button>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom: 8px;">
+                        <img src="{{ asset('images/logo-icon-badge.png') }}" alt="Logo" style="height: 40px;">
+                        <p class="sidebar-title" style="margin:0;">Sekretariat Navigation</p>
                     </div>
-                    <div class="user-badge">{{ auth()->user()->email ?? 'sekretariat@example.com' }}</div>
+                    <a href="{{ route('dashboard.sekretariat') }}" class="nav-link {{ Request::routeIs('dashboard.sekretariat') ? 'active' : '' }}">Dashboard</a>
+                    <a href="{{ route('arsip.index') }}" class="nav-link {{ Request::routeIs('arsip.*') ? 'active' : '' }}">Upload Berkas</a>
+                    <a href="{{ route('nomor-surat.index') }}" class="nav-link {{ request()->routeIs('nomor-surat.*') ? 'active' : '' }}">Perilisan Nomor</a>
+                    <a href="{{ route('notulensi.index') }}" class="nav-link {{ Request::routeIs('notulensi.*') ? 'active' : '' }}">Notulensi</a>
+
+                    <a href="{{ route('arsip.index', ['cakupan' => 'sendiri']) }}#daftar-arsip" class="nav-link {{ request('cakupan') === 'sendiri' ? 'active' : '' }}">
+                        Arsip Sekretariat
+                    </a>
+                    <a href="{{ route('laporan.index') }}" class="nav-link {{ Request::routeIs('laporan.*') ? 'active' : '' }}">Laporan Bulanan</a>
+                    <a href="{{ route('log-aktivitas.index') }}" class="nav-link {{ Request::routeIs('log-aktivitas.*') ? 'active' : '' }}">Log Aktivitas</a>
+                    <a href="{{ route('employee.consultations.index') }}" class="nav-link {{ Request::routeIs('employee.consultations.*') ? 'active' : '' }}">Konsultasi
+                        Hukum</a>
+                    <a href="{{ route('library.index') }}" class="nav-link {{ Request::routeIs('library.*') ? 'active' : '' }}">Perpustakaan</a>
+                    <div class="sidebar-footer">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="button button-secondary" style="width:100%;">Logout</button>
+                        </form>
+                    </div>
                 </div>
-                @yield('content')
-            </div>
-        </main>
-    </div>
-    <script>
-        function isMobile() {
-            return window.innerWidth <= 980;
-        }
+            </aside>
+            <main class="main-content">
+                <div class="sidebar-toolbar">
+                    <button type="button" class="sidebar-toggle" onclick="toggleSidebar()"
+                        aria-label="Buka atau tutup menu"><x-ui-icon name="menu" /></button>
+                </div>
+                <div class="page-container">
+                    <div class="topbar">
+                        <div class="page-header">
+                            <p class="page-subtitle">Sekretariat & Pengarsipan</p>
+                            <h1 class="page-title">{{ auth()->user()->name }}</h1>
+                        </div>
+                        <div class="user-badge">{{ auth()->user()->email ?? 'sekretariat@example.com' }}</div>
+                    </div>
+                    @yield('content')
+                </div>
+            </main>
+        </div>
+        @include('layouts.sidebar-controls-script')
+    </body>
 
-        function toggleSidebar() {
-            const shell = document.getElementById('appShell');
-            if (isMobile()) {
-                shell.classList.toggle('sidebar-open');
-            } else {
-                shell.classList.toggle('sidebar-collapsed');
-            }
-        }
-
-        function closeSidebarMobile() {
-            document.getElementById('appShell').classList.remove('sidebar-open');
-        }
-    </script>
-</body>
 </html>

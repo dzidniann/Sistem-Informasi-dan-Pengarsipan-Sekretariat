@@ -16,10 +16,7 @@ class UserController extends Controller
         $roles = Role::all();
         $bidangList = Bidang::all();
 
-        return view(
-            'admin.pengguna.index',
-            compact('users', 'roles', 'bidangList')
-        );
+        return view('admin.pengguna.index', compact('users', 'roles', 'bidangList'));
     }
 
     public function store(Request $request)
@@ -41,10 +38,7 @@ class UserController extends Controller
             'is_active' => true,
         ]);
 
-        return back()->with(
-            'success',
-            'Pengguna berhasil ditambahkan'
-        );
+        return back()->with('success', 'Pengguna berhasil ditambahkan');
     }
 
     public function update(Request $request, User $user)
@@ -56,40 +50,24 @@ class UserController extends Controller
             'bidang_id' => 'required|exists:bidangs,id',
         ]);
 
-        $user->update(
-            $request->only(
-                'name',
-                'email',
-                'role_id',
-                'bidang_id'
-            )
-        );
+        $user->update($request->only('name', 'email', 'role_id', 'bidang_id'));
 
-        return back()->with(
-            'success',
-            'Pengguna berhasil diperbarui'
-        );
+        return back()->with('success', 'Pengguna berhasil diperbarui');
     }
 
     public function toggleAktif(User $user)
     {
         $user->update([
-            'is_active' => !$user->is_active
+            'is_active' => !$user->is_active,
         ]);
 
-        return back()->with(
-            'success',
-            'Status pengguna diperbarui'
-        );
+        return back()->with('success', 'Status pengguna diperbarui');
     }
 
     public function role()
     {
         $roles = Role::withCount('users')->get();
 
-        return view(
-            'admin.role.index',
-            compact('roles')
-        );
+        return view('admin.role.index', compact('roles'));
     }
 }

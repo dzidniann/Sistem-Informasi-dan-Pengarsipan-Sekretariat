@@ -19,13 +19,19 @@ class NomorSuratService
         return ($max ?? 0) + 1;
     }
 
-    public function rilis(int $idKategori, int $nomorUrut, ?int $userId, int $bulan, int $tahun, array $detail = []): ArsipSurat
-    {
+    public function rilis(
+        int $idKategori,
+        int $nomorUrut,
+        ?int $userId,
+        int $bulan,
+        int $tahun,
+        array $detail = [],
+        array $files = [],
+    ): ArsipSurat {
         $kategori = KategoriSurat::findOrFail($idKategori);
         $bulanRomawi = RomawiHelper::dariBulan($bulan);
 
-        return DB::transaction(function () use ($kategori, $nomorUrut, $tahun, $bulanRomawi, $userId, $detail) {
-
+        return DB::transaction(function () use ($kategori, $nomorUrut, $tahun, $bulanRomawi, $userId, $detail, $files) {
             $sudahAda = ArsipSurat::where('id_kategori', $kategori->id_kategori)
                 ->where('tahun', $tahun)
                 ->where('nomor_urut', $nomorUrut)
@@ -38,15 +44,19 @@ class NomorSuratService
                 $nomorFormat .= '/THB';
             }
 
-            return ArsipSurat::create(array_merge($detail, [
-                'id_kategori' => $kategori->id_kategori,
-                'nomor_urut' => $nomorUrut,
-                'bulan_romawi' => $bulanRomawi,
-                'tahun' => $tahun,
-                'is_backdate' => $sudahAda,
-                'full_nomor' => $nomorFormat,
-                'dirilis_oleh' => $userId,
-            ]));
+            return NamedUploads::create(
+                ArsipSurat::class,
+                array_merge($detail, [
+                    'id_kategori' => $kategori->id_kategori,
+                    'nomor_urut' => $nomorUrut,
+                    'bulan_romawi' => $bulanRomawi,
+                    'tahun' => $tahun,
+                    'is_backdate' => $sudahAda,
+                    'full_nomor' => $nomorFormat,
+                    'dirilis_oleh' => $userId,
+                ]),
+                $files,
+            );
         });
     }
 }

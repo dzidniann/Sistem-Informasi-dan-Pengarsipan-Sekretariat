@@ -1,7 +1,6 @@
 @extends('sekretariat.layout')
 
 @section('content')
-
     <div class="page-header">
         <h2 class="page-title">Laporan Bulanan</h2>
         <p class="page-subtitle">Pilih bulan dan tahun untuk melihat ringkasan laporan arsip.</p>
@@ -11,8 +10,9 @@
         <form method="GET" action="{{ route('laporan.generate') }}">
             <label class="form-label">Bulan</label>
             <select name="bulan" required class="form-control">
-                @for($i = 1; $i <= 12; $i++)
-                    <option value="{{ $i }}">{{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}</option>
+                @for ($i = 1; $i <= 12; $i++)
+                    <option value="{{ $i }}">{{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+                    </option>
                 @endfor
             </select>
 
@@ -23,4 +23,3 @@
         </form>
     </div>
 @endsection
-

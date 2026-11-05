@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\NamedUploads;
+
 use App\Models\ArsipSurat;
 use App\Models\KategoriSurat;
 use App\Services\NomorSuratService;
@@ -31,9 +33,7 @@ class NomorSuratController extends Controller
 
     public function daftarKategoriAktif()
     {
-        $kategori = KategoriSurat::where('is_active', true)
-            ->orderBy('nama_kategori')
-            ->get();
+        $kategori = KategoriSurat::where('is_active', true)->orderBy('nama_kategori')->get();
 
         return response()->json($kategori);
     }
@@ -41,15 +41,12 @@ class NomorSuratController extends Controller
     public function ambilNomorBerikutnya(Request $request, NomorSuratService $service)
     {
         $request->validate([
-            'id_kategori' => 'required|exists:master_kategori_surat,id_kategori'
+            'id_kategori' => 'required|exists:master_kategori_surat,id_kategori',
         ]);
 
         $kategori = KategoriSurat::findOrFail($request->id_kategori);
         $tahun = $request->tahun ?? now()->year;
-        $nomorSelanjutnya = $service->nomorSelanjutnya(
-            $kategori->id_kategori,
-            $tahun
-        );
+        $nomorSelanjutnya = $service->nomorSelanjutnya($kategori->id_kategori, $tahun);
 
         return response()->json([
             'id_kategori' => $kategori->id_kategori,
@@ -63,8 +60,7 @@ class NomorSuratController extends Controller
 
     public function riwayatJson(Request $request)
     {
-        $query = ArsipSurat::with('kategori', 'perilis')
-            ->latest('created_at');
+        $query = ArsipSurat::with('kategori', 'perilis')->latest('created_at');
 
         if ($request->filled('id_kategori')) {
             $query->where('id_kategori', $request->id_kategori);
@@ -86,7 +82,6 @@ class NomorSuratController extends Controller
             ->take(50)
             ->get()
             ->map(function ($r) {
-
                 return [
                     'id_surat' => $r->id_surat,
                     'full_nomor' => $r->full_nomor,
@@ -96,9 +91,7 @@ class NomorSuratController extends Controller
                     'kategori' => $r->kategori->nama_kategori ?? '-',
                     'is_backdate' => $r->is_backdate,
                     'perilis' => $r->perilis->name ?? '-',
-                    'waktu' => $r->created_at
-                        ? $r->created_at->format('d M Y, H:i')
-                        : '-',
+                    'waktu' => $r->created_at ? $r->created_at->format('d M Y, H:i') : '-',
                     'file_path' => $r->file_path,
                 ];
             });
@@ -117,16 +110,10 @@ class NomorSuratController extends Controller
             'perihal' => 'nullable|string|max:255',
             'tujuan' => 'nullable|string|max:255',
             'catatan' => 'nullable|string',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:8192',
         ]);
 
         $nomorUrutBersih = (int) $request->nomor_urut;
-
-        $filePath = null;
-
-        if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('nomor-surat', 'public');
-        }
 
         $hasil = $service->rilis(
             $request->id_kategori,
@@ -139,24 +126,22 @@ class NomorSuratController extends Controller
                 'perihal' => $request->perihal,
                 'tujuan' => $request->tujuan,
                 'catatan' => $request->catatan,
-                'file_path' => $filePath,
-            ]
+            ],
+            $request->hasFile('file') ? ['file_path' => [$request->file('file'), 'nomor-surat', 'public']] : [],
         );
 
-
         if ($hasil->is_backdate) {
-            return redirect()->route('nomor-surat.index')
+            return redirect()
+                ->route('nomor-surat.index')
                 ->with(
                     'warning',
-                    "Nomor {$nomorUrutBersih} sudah pernah dirilis untuk kategori ini. Nomor ditandai sisipan: {$hasil->full_nomor}"
+                    "Nomor {$nomorUrutBersih} sudah pernah dirilis untuk kategori ini. Nomor ditandai sisipan: {$hasil->full_nomor}",
                 );
         }
 
-        return redirect()->route('nomor-surat.index')
-            ->with(
-                'success',
-                "Nomor surat berhasil dirilis: {$hasil->full_nomor}"
-            );
+        return redirect()
+            ->route('nomor-surat.index')
+            ->with('success', "Nomor surat berhasil dirilis: {$hasil->full_nomor}");
     }
 
     public function show(ArsipSurat $arsipSurat)
@@ -164,41 +149,32 @@ class NomorSuratController extends Controller
         return view('nomor-surat.show', ['surat' => $arsipSurat]);
     }
 
-   public function update(Request $request, ArsipSurat $arsipSurat)
-{
-    $request->validate([
-        'tanggal_surat' => 'nullable|date',
-        'perihal' => 'nullable|string|max:255',
-        'tujuan' => 'nullable|string|max:255',
-        'catatan' => 'nullable|string',
-        'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
-    ]);
+    public function update(Request $request, ArsipSurat $arsipSurat)
+    {
+        $request->validate([
+            'tanggal_surat' => 'nullable|date',
+            'perihal' => 'nullable|string|max:255',
+            'tujuan' => 'nullable|string|max:255',
+            'catatan' => 'nullable|string',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:8192',
+        ]);
 
-    $data = $request->only([
-        'tanggal_surat',
-        'perihal',
-        'tujuan',
-        'catatan',
-    ]);
+        $data = $request->only(['tanggal_surat', 'perihal', 'tujuan', 'catatan']);
 
-    if ($request->hasFile('file')) {
-        if (
-            $arsipSurat->file_path &&
-            \Storage::disk('public')->exists($arsipSurat->file_path)
-        ) {
-            \Storage::disk('public')->delete($arsipSurat->file_path);
+        if ($request->hasFile('file')) {
+            $data['file_path'] = NamedUploads::store(
+                $request->file('file'),
+                'nomor-surat',
+                'public',
+                (int) $arsipSurat->getKey(),
+                'file_path',
+            );
         }
 
-        $data['file_path'] = $request->file('file')
-            ->store('nomor-surat', 'public');
+        $arsipSurat->update($data);
+
+        return redirect()
+            ->route('nomor-surat.show', $arsipSurat)
+            ->with('success', 'Detail surat berhasil diperbarui: ' . $arsipSurat->full_nomor);
     }
-
-    $arsipSurat->update($data);
-
-    return redirect()->route('nomor-surat.show', $arsipSurat)
-        ->with(
-            'success',
-            'Detail surat berhasil diperbarui: ' . $arsipSurat->full_nomor
-        );
-}
 }

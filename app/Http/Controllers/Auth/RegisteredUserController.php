@@ -32,14 +32,20 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        $employeeRole = \App\Models\Role::where('nama', 'employee')->first() ?? \App\Models\Role::first();
+        $bidangUmum = \App\Models\Bidang::where('nama_bidang', 'Umum')->first() ?? \App\Models\Bidang::first();
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role_id' => $employeeRole?->id,
+            'bidang_id' => $bidangUmum?->id,
+            'is_active' => true,
         ]);
 
         event(new Registered($user));

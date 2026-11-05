@@ -1,314 +1,266 @@
-@extends(auth()->user()->role->nama === 'sekretariat' ? 'sekretariat.layout' : 'staf.layout')
+@extends(
+    match (auth()->user()->role->nama) {
+        'sekretariat' => 'sekretariat.layout',
+        'humas' => 'humas.layout',
+        default => 'staf.layout'
+    }
+)
 
 @section('content')
+    <div class="page-header">
+        <h2 class="page-title">
+            {{ $cakupanSendiri ? 'Arsip Sekretariat' : 'Upload & Arsip Berkas' }}
+        </h2>
 
-<div class="page-header">
-    <h2 class="page-title">
-        {{ $cakupanSendiri ? 'Arsip Sekretariat' : 'Upload & Arsip Berkas' }}
-    </h2>
-
-    <p class="page-subtitle">
-        {{ $cakupanSendiri
-            ? 'Menampilkan arsip milik bidang Sekretariat dan Pengarsipan saja.'
-            : 'Kelola dokumen dan cari arsip dengan cepat dari satu tampilan.' }}
-    </p>
-</div>
+        <p class="page-subtitle">
+            {{ $cakupanSendiri
+                ? 'Menampilkan arsip milik bidang Sekretariat dan Pengarsipan saja.'
+                : 'Kelola dokumen dan cari arsip dengan cepat dari satu tampilan.' }}
+        </p>
+    </div>
 
 
-@if(session('success'))
-    <p style="color: #16a34a; font-weight: 600;">
-        {{ session('success') }}
-    </p>
-@endif
+    @if (session('success'))
+        <p style="color: #16a34a; font-weight: 600;">
+            {{ session('success') }}
+        </p>
+    @endif
 
-<div class="card">
+    <div class="card">
 
-    <h3 style="
+        <h3 style="
         margin-top: 0;
         margin-bottom: 16px;
         font-size: 1.1rem;
-        color: #0f172a;">Upload Berkas
-    </h3>
+        color: #0f172a;">
+            Upload Berkas
+        </h3>
 
-    <form
-        method="POST"
-        action="{{ route('arsip.store') }}"
-        enctype="multipart/form-data">
+        <form method="POST" action="{{ route('arsip.store') }}" enctype="multipart/form-data">
 
-        @csrf
+            @csrf
 
-        <label class="form-label">Kategori</label>
+            <label class="form-label">Kategori</label>
 
-        <select
-            name="kategori_id"
-            required
-            class="form-control">
-            <option value="">
-                -- Pilih kategori --
-            </option>
-
-            @foreach($kategoriList as $k)
-                <option value="{{ $k->id }}">
-                    {{ $k->nama }}
+            <select name="kategori_id" required class="form-control">
+                <option value="">
+                    -- Pilih kategori --
                 </option>
-            @endforeach
-        </select>
+
+                @foreach ($kategoriList as $k)
+                    <option value="{{ $k->id }}">
+                        {{ $k->nama }}
+                    </option>
+                @endforeach
+            </select>
 
 
-        <label class="form-label">Judul File</label>
+            <label class="form-label">Judul File</label>
 
-        <input
-            type="text"
-            name="judul_file"
-            required
-            class="form-control">
-        <label class="form-label">
-            Tanggal
-        </label>
+            <input type="text" name="judul_file" required class="form-control">
+            <label class="form-label">
+                Tanggal
+            </label>
 
-        <input
-            type="date"
-            name="tanggal"
-            required
-            class="form-control">
+            <input type="date" name="tanggal" required class="form-control">
 
 
-        <label class="form-label">Berkas</label>
+            <label class="form-label">Berkas</label>
 
-        <input
-            type="file"
-            name="file"
-            required
-            class="form-control">
+            <input type="file" name="file" required class="form-control">
 
 
-        <button
-            type="submit"
-            class="button button-primary"
-            style="margin-top: 16px;">Simpan</button>
-    </form>
-</div>
-
-<div class="card" id="daftar-arsip">
-    <div
-        class="topbar"
-        style="
-            padding: 0;
-            align-items: flex-end;
-            gap: 16px;">
-        <div>
-            <h3
-                class="page-title"
-                style="
-                font-size: 1.1rem;
-                margin: 0;">Daftar Arsip
-            </h3>
-
-            <p
-                class="page-subtitle"
-                style="
-                margin: 6px 0 0;">
-                Semua arsip yang tersedia ditampilkan di sini.
-            </p>
-        </div>
-
-        <form
-            method="GET"
-            action="{{ route('arsip.index') }}"
-            class="search-group">
-
-            <input
-                type="hidden"
-                name="cakupan"
-                value="{{ request('cakupan') }}">
-
-            <input
-                type="text"
-                name="cari"
-                placeholder="Cari semua data arsip..."
-                value="{{ request('cari') }}"
-                class="form-control">
-
-            <button
-                type="submit"
-                class="button button-primary button-search">Cari
-            </button>
+            <button type="submit" class="button button-primary" style="margin-top: 16px;">Simpan</button>
         </form>
     </div>
 
-    <div class="table-card">
+    <div class="card" id="daftar-arsip">
+        <div class="topbar" style="
+            padding: 0;
+            align-items: flex-end;
+            gap: 16px;">
+            <div>
+                <h3 class="page-title" style="
+                font-size: 1.1rem;
+                margin: 0;">Daftar Arsip
+                </h3>
 
-        <div class="table-wrapper">
+                <p class="page-subtitle" style="
+                margin: 6px 0 0;">
+                    {{ $cakupanSendiri ? 'Arsip bidang sendiri ditampilkan di sini.' : 'Arsip sesuai hak akses ditampilkan di sini.' }}
+                </p>
+            </div>
 
-            <table class="table">
+            <form method="GET" action="{{ route('arsip.index') }}" class="search-group">
 
-                <thead>
-                    <tr>
-                        <th style="text-align: left;">
-                            Judul File
-                        </th>
+                <input type="hidden" name="cakupan" value="{{ request('cakupan') }}">
 
-                        <th style="text-align: center;">
-                            Kategori
-                        </th>
+                <input type="text" name="cari" placeholder="Cari semua data arsip..." value="{{ request('cari') }}"
+                    class="form-control">
 
-                        @if(auth()->user()->bisaAksesSemuaBidang() && !$cakupanSendiri)
+                <button type="submit" class="button button-primary button-search">Cari
+                </button>
+            </form>
+        </div>
 
-                            <th style="text-align: center;">
-                                Bidang
+        <div class="table-card">
+
+            <div class="table-wrapper">
+
+                <table class="table">
+
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">
+                                Judul File
                             </th>
 
-                        @endif
+                            <th style="text-align: center;">
+                                Kategori
+                            </th>
 
-                        <th style="text-align: center;">
-                            Tanggal Dokumen
-                        </th>
+                            @if (auth()->user()->bisaAksesSemuaBidang() && !$cakupanSendiri)
+                                <th style="text-align: center;">
+                                    Bidang
+                                </th>
+                            @endif
 
-                        <th style="text-align: center;">
-                            Berkas
-                        </th>
+                            <th style="text-align: center;">
+                                Tanggal Dokumen
+                            </th>
 
-                    </tr>
-                </thead>
+                            <th style="text-align: center;">
+                                Berkas
+                            </th>
+
+                        </tr>
+                    </thead>
 
 
-                <tbody>
+                    <tbody>
 
-                    @forelse($arsip as $a)
+                        @forelse($arsip as $a)
+                            <tr>
+                                {{-- JUDUL --}}
+                                <td style="text-align: left;">
 
-                        <tr>
-                            {{-- JUDUL --}}
-                            <td style="text-align: left;">
-
-                                <a
-                                    href="{{ route('arsip.show', $a->id) }}"
-                                    class="button button-secondary"
-                                    style="
+                                    <a href="{{ route('arsip.show', $a->id) }}" class="button button-secondary"
+                                        style="
                                         padding: 8px 12px;
                                         display: inline-block;
                                         background: #f8fafc;
                                         color: #0f172a;
-                                    "
-                                >
-                                    {{ $a->judul_file }}
-                                </a>
-
-                            </td>
-
-
-                            {{-- KATEGORI --}}
-
-                            <td style="text-align: center;">
-
-                                {{ $a->kategori->nama ?? '-' }}
-
-                            </td>
-
-
-                            {{-- BIDANG --}}
-
-                            @if(auth()->user()->bisaAksesSemuaBidang() && !$cakupanSendiri)
-
-                                <td style="text-align: center;">
-
-                                    {{ $a->bidang->nama_bidang ?? '-' }}
+                                    ">
+                                        {{ $a->judul_file }}
+                                    </a>
 
                                 </td>
 
-                            @endif
+
+                                {{-- KATEGORI --}}
+
+                                <td style="text-align: center;">
+
+                                    {{ $a->kategori->nama ?? '-' }}
+
+                                </td>
 
 
-                            {{-- TANGGAL --}}
+                                {{-- BIDANG --}}
 
-                            <td style="text-align: center;">
+                                @if (auth()->user()->bisaAksesSemuaBidang() && !$cakupanSendiri)
+                                    <td style="text-align: center;">
 
-                                {{ \Carbon\Carbon::parse($a->tanggal)->format('d M Y') }}
+                                        {{ $a->bidang->nama_bidang ?? '-' }}
 
-                            </td>
-
-
-                            {{-- BERKAS --}}
-
-                            <td style="text-align: center;">
-
-                                @if($a->file_path)
-                                
-                                    {{-- Mengirimkan URL dan Judul File (dinamis) ke JS --}}
-                                    <a href="javascript:void(0)"
-                                       onclick="previewBerkas('{{ asset('storage/' . $a->file_path) }}', '{{ addslashes($a->judul_file) }}')"
-                                       title="Lihat Berkas"
-                                       style="color: #475569; display: inline-flex; justify-content: center; align-items: center; background: transparent; border: none; padding: 0; transition: color 0.2s ease;"
-                                       onmouseover="this.style.color='#2563eb'" 
-                                       onmouseout="this.style.color='#475569'">
-                                       
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                    </a>
-
-                                @else
-
-                                    <span style="color:#94a3b8; font-size: 0.9rem;">
-                                        Tidak ada
-                                    </span>
-
+                                    </td>
                                 @endif
 
-                            </td>
 
-                        </tr>
+                                {{-- TANGGAL --}}
+
+                                <td style="text-align: center;">
+
+                                    {{ \Carbon\Carbon::parse($a->tanggal)->format('d M Y') }}
+
+                                </td>
 
 
-                    @empty
+                                {{-- BERKAS --}}
 
-                        <tr>
+                                <td style="text-align: center;">
 
-                            <td
-                                colspan="{{ auth()->user()->bisaAksesSemuaBidang() && !$cakupanSendiri ? 5 : 4 }}"
-                                style="
+                                    @if ($a->file_path)
+                                        {{-- Mengirimkan URL dan Judul File (dinamis) ke JS --}}
+                                        <a href="javascript:void(0)"
+                                            onclick="previewBerkas('{{ asset('storage/' . $a->file_path) }}', '{{ addslashes($a->judul_file) }}')"
+                                            title="Lihat Berkas"
+                                            style="color: #475569; display: inline-flex; justify-content: center; align-items: center; background: transparent; border: none; padding: 0; transition: color 0.2s ease;"
+                                            onmouseover="this.style.color='#2563eb'"
+                                            onmouseout="this.style.color='#475569'">
+
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </a>
+                                    @else
+                                        <span style="color:#94a3b8; font-size: 0.9rem;">
+                                            Tidak ada
+                                        </span>
+                                    @endif
+
+                                </td>
+
+                            </tr>
+
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="{{ auth()->user()->bisaAksesSemuaBidang() && !$cakupanSendiri ? 5 : 4 }}"
+                                    style="
                                     text-align:center;
                                     color:#64748b;
                                     padding: 20px;
-                                "
-                            >
-                                Tidak ada arsip yang ditemukan.
-                            </td>
+                                ">
+                                    Tidak ada arsip yang ditemukan.
+                                </td>
 
-                        </tr>
+                            </tr>
+                        @endforelse
 
-                    @endforelse
+                    </tbody>
 
-                </tbody>
+                </table>
 
-            </table>
+            </div>
 
+        </div>
+
+
+        {{-- PAGINATION --}}
+
+        <div
+            style="
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+        ">
+            {{ $arsip->links('vendor.pagination.custom') }}
         </div>
 
     </div>
 
 
-    {{-- PAGINATION --}}
-
-    <div
-        style="
-            margin-top: 16px;
-            display: flex;
-            justify-content: center;
-        "
-    >
-        {{ $arsip->links('vendor.pagination.custom') }}
-    </div>
-
-</div>
-
-
-{{-- =====================================================
+    {{-- =====================================================
      MODAL PREVIEW BERKAS (UI BARU)
 ===================================================== --}}
-<div
-    id="modal-preview-berkas"
-    style="
+    <div id="modal-preview-berkas"
+        style="
         position:fixed;
         inset:0;
         z-index:9999;
@@ -318,11 +270,10 @@
         justify-content:center;
         padding:20px;
         box-sizing:border-box;
-    "
->
+    ">
 
-    <div
-        style="
+        <div
+            style="
             width:95%;
             max-width:1000px;
             height:90vh;
@@ -332,56 +283,47 @@
             box-shadow:0 25px 60px rgba(0,0,0,.25);
             display: flex;
             flex-direction: column;
-        "
-    >
+        ">
 
-        {{-- HEADER MODAL --}}
-        <div
-            style="
+            {{-- HEADER MODAL --}}
+            <div
+                style="
                 display:flex;
                 align-items:center;
                 justify-content:space-between;
                 padding:16px 24px;
                 border-bottom:1px solid #e2e8f0;
                 background: #ffffff;
-            "
-        >
+            ">
 
-            <h3
-                style="
+                <h3
+                    style="
                     margin:0; 
                     color:#0f172a; 
                     font-size:1.1rem; 
                     font-weight: 500;
-                "
-            >
-                Preview Berkas
-            </h3>
+                ">
+                    Preview Berkas
+                </h3>
 
-            <div style="display: flex; align-items: center; gap: 16px;">
-                
-                {{-- Pintasan Download di Header --}}
-                <a 
-                    id="modal-header-download" 
-                    href="#" 
-                    download 
-                    title="Download Berkas" 
-                    style="color: #64748b; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: color 0.2s;" 
-                    onmouseover="this.style.color='#0f172a'" 
-                    onmouseout="this.style.color='#64748b'"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                </a>
+                <div style="display: flex; align-items: center; gap: 16px;">
 
-                {{-- Tombol Close Bergaya Pill --}}
-                <button
-                    type="button"
-                    onclick="tutupPreviewBerkas()"
-                    style="
+                    {{-- Pintasan Download di Header --}}
+                    <a id="modal-header-download" href="#" download title="Download Berkas"
+                        style="color: #64748b; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: color 0.2s;"
+                        onmouseover="this.style.color='#0f172a'" onmouseout="this.style.color='#64748b'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </a>
+
+                    {{-- Tombol Close Bergaya Pill --}}
+                    <button type="button" onclick="tutupPreviewBerkas()"
+                        style="
                         background: #ffffff; 
                         border: 1px solid #f1f5f9; 
                         box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
@@ -395,23 +337,23 @@
                         cursor: pointer; 
                         transition: all 0.2s ease;
                     "
-                    onmouseover="this.style.background='#f8fafc'; this.style.color='#0f172a'" 
-                    onmouseout="this.style.background='#ffffff'; this.style.color='#475569'"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+                        onmouseover="this.style.background='#f8fafc'; this.style.color='#0f172a'"
+                        onmouseout="this.style.background='#ffffff'; this.style.color='#475569'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
             </div>
 
-        </div>
 
-
-        {{-- ISI PREVIEW --}}
-        <div
-            id="preview-berkas-content"
-            style="
+            {{-- ISI PREVIEW --}}
+            <div id="preview-berkas-content"
+                style="
                 flex: 1;
                 overflow:auto;
                 background:#f8fafc;
@@ -420,17 +362,16 @@
                 justify-content:center;
                 padding:20px;
                 box-sizing:border-box;
-            "
-        >
+            ">
+
+            </div>
 
         </div>
 
     </div>
 
-</div>
 
-
-<script>
+    <script>
 
 // Menambahkan parameter namaFile dengan default value
 function previewBerkas(url, namaFile = 'Unduhan Berkas')
@@ -617,5 +558,4 @@ document.getElementById('modal-preview-berkas')?.addEventListener('click', funct
 });
 
 </script>
-
 @endsection

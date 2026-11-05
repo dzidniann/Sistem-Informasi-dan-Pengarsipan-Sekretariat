@@ -1,215 +1,208 @@
 @extends('sekretariat.layout')
 
 @section('content')
+    <div class="page-header">
+        <h2 class="page-title">
+            Notulensi
+        </h2>
+        <p class="page-subtitle">
+            Tambah notulensi rapat dan akses riwayat dengan gaya profesional.
+        </p>
+    </div>
 
-<div class="page-header">
-    <h2 class="page-title">
-        Notulensi
-    </h2>
-    <p class="page-subtitle">
-        Tambah notulensi rapat dan akses riwayat dengan gaya profesional.
-    </p>
-</div>
+    @if (session('success'))
+        <p style="color: #16a34a; font-weight: 600;">
+            {{ session('success') }}
+        </p>
+    @endif
 
-@if(session('success'))
-    <p style="color: #16a34a; font-weight: 600;">
-        {{ session('success') }}
-    </p>
-@endif
-
-{{-- =====================================================
+    {{-- =====================================================
      FORM TAMBAH NOTULENSI
 ===================================================== --}}
-<div class="card">
-    <h3 style="margin-top: 0; margin-bottom: 18px; font-size: 1.1rem; color: #0f172a;">
-        Tambah Notulensi
-    </h3>
+    <div class="card">
+        <h3 style="margin-top: 0; margin-bottom: 18px; font-size: 1.1rem; color: #0f172a;">
+            Tambah Notulensi
+        </h3>
 
-    <form method="POST" action="{{ route('notulensi.store') }}" enctype="multipart/form-data">
-        @csrf
-        
-        <label class="form-label">Judul Rapat</label>
-        <input type="text" name="judul_rapat" required class="form-control">
+        <form method="POST" action="{{ route('notulensi.store') }}" enctype="multipart/form-data">
+            @csrf
 
-        <label class="form-label">Tanggal Rapat</label>
-        <input type="date" name="tanggal_rapat" required class="form-control">
+            <label class="form-label">Judul Rapat</label>
+            <input type="text" name="judul_rapat" required class="form-control">
 
-        <label class="form-label">Nama Notulis</label>
-        <input type="text" name="notulis" required class="form-control">
+            <label class="form-label">Tanggal Rapat</label>
+            <input type="date" name="tanggal_rapat" required class="form-control">
 
-        <label class="form-label">Deskripsi Singkat</label>
-        <textarea name="deskripsi_singkat" rows="3" class="form-control"></textarea>
+            <label class="form-label">Nama Notulis</label>
+            <input type="text" name="notulis" required class="form-control">
 
-        <label class="form-label">Foto Dokumentasi (opsional)</label>
-        <input type="file" name="foto" accept="image/*" class="form-control">
+            <label class="form-label">Deskripsi Singkat</label>
+            <textarea name="deskripsi_singkat" rows="3" class="form-control"></textarea>
 
-        <label class="form-label">File Notulensi</label>
-        <input type="file" name="file" required class="form-control">
+            <label class="form-label">Foto Dokumentasi (opsional)</label>
+            <input type="file" name="foto" accept="image/*" class="form-control">
 
-        <button type="submit" class="button button-primary" style="margin-top: 16px;">
-            Simpan
-        </button>
-    </form>
-</div>
+            <label class="form-label">File Notulensi</label>
+            <input type="file" name="file" required class="form-control">
 
-{{-- =====================================================
-     RIWAYAT NOTULENSI
-===================================================== --}}
-<div class="card" id="daftar-notulensi">
-
-    <div class="topbar" style="padding: 0; align-items: flex-end; gap: 16px;">
-        <div>
-            <h3 class="page-title" style="font-size: 1.1rem; margin: 0;">
-                Riwayat Notulensi
-            </h3>
-            <p class="page-subtitle" style="margin: 6px 0 0;">
-                Semua notulensi rapat tersedia dalam daftar berikut.
-            </p>
-        </div>
-
-        <form method="GET" action="{{ route('notulensi.index') }}" class="search-group">
-            <input type="text" name="cari" placeholder="Cari notulensi..." value="{{ request('cari') }}" class="form-control">
-            <button type="submit" class="button button-primary button-search">
-                Cari
+            <button type="submit" class="button button-primary" style="margin-top: 16px;">
+                Simpan
             </button>
         </form>
     </div>
 
-    {{-- =================================================
+    {{-- =====================================================
+     RIWAYAT NOTULENSI
+===================================================== --}}
+    <div class="card" id="daftar-notulensi">
+
+        <div class="topbar" style="padding: 0; align-items: flex-end; gap: 16px;">
+            <div>
+                <h3 class="page-title" style="font-size: 1.1rem; margin: 0;">
+                    Riwayat Notulensi
+                </h3>
+                <p class="page-subtitle" style="margin: 6px 0 0;">
+                    Semua notulensi rapat tersedia dalam daftar berikut.
+                </p>
+            </div>
+
+            <form method="GET" action="{{ route('notulensi.index') }}" class="search-group">
+                <input type="text" name="cari" placeholder="Cari notulensi..." value="{{ request('cari') }}"
+                    class="form-control">
+                <button type="submit" class="button button-primary button-search">
+                    Cari
+                </button>
+            </form>
+        </div>
+
+        {{-- =================================================
          TABLE
     ================================================== --}}
-    <div class="table-card">
-        <div class="table-wrapper">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="text-align:left;">Judul Rapat</th>
-                        <th style="text-align:center;">Tanggal</th>
-                        <th style="text-align:left;">Notulis</th>
-                        <th style="text-align:center;">Berkas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($notulensi as $n)
+        <div class="table-card">
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
                         <tr>
-                            <td style="text-align:left;"> 
-                                <a href="{{ route('notulensi.show', $n->id) }}"
-                                class="button button-secondary"
-                                style="padding: 8px 12px;
+                            <th style="text-align:left;">Judul Rapat</th>
+                            <th style="text-align:center;">Tanggal</th>
+                            <th style="text-align:left;">Notulis</th>
+                            <th style="text-align:center;">Berkas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($notulensi as $n)
+                            <tr>
+                                <td style="text-align:left;">
+                                    <a href="{{ route('notulensi.show', $n->id) }}" class="button button-secondary"
+                                        style="padding: 8px 12px;
                                         display: inline-block;
                                         backgroung: #f8fafc;
                                         color: #0f172a;
                                         font-weight: 500;
                                         border: 1px solid #e2e8f0;">
-                                 {{ $n->judul_rapat }}
-                                </a>
-                             </td>
-                            
-                            <td style="text-align:center;">
-                                {{ \Carbon\Carbon::parse($n->tanggal_rapat)->format('d M Y') }}
-                            </td>
-                            
-                            <td style="text-align:left;">{{ $n->notulis }}</td>
-                            
-                            <td style="text-align:center;">
-                                @if($n->file_path)
-                                    <!-- Fungsi onclick diperbarui dengan parameter judul_rapat dinamis -->
-                                    <a
-                                        href="javascript:void(0)"
-                                        onclick="previewBerkas('{{ asset('storage/' . $n->file_path) }}', '{{ addslashes($n->judul_rapat) }}')"
-                                        title="Lihat Berkas"
-                                        style="color:#475569; display:inline-flex; justify-content:center; align-items:center; background:transparent; border:none; padding:0; cursor:pointer; transition:color .2s ease;"
-                                        onmouseover="this.style.color='#2563eb'"
-                                        onmouseout="this.style.color='#475569'"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
+                                        {{ $n->judul_rapat }}
                                     </a>
-                                @else
-                                    <span style="color:#94a3b8; font-size:.9rem;">
-                                        Tidak ada
-                                    </span>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" style="text-align:center; color:#64748b; padding:20px;">
-                                Tidak ada notulensi yang ditemukan
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
+                                </td>
 
-    {{-- PAGINATION --}}
-    <div style="margin-top:16px; display:flex; justify-content:center;">
-        {{ $notulensi->links('vendor.pagination.custom') }}
-    </div>
+                                <td style="text-align:center;">
+                                    {{ \Carbon\Carbon::parse($n->tanggal_rapat)->format('d M Y') }}
+                                </td>
 
-</div>
+                                <td style="text-align:left;">{{ $n->notulis }}</td>
 
-{{-- =====================================================
-     MODAL PREVIEW BERKAS (UI BARU)
-===================================================== --}}
-<div
-    id="modal-preview-berkas"
-    style="position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.65); display:none; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;"
->
-    <div
-        style="width:95%; max-width:1000px; height:90vh; background:white; border-radius:14px; overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,.25); display: flex; flex-direction: column;"
-    >
-        {{-- HEADER MODAL --}}
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid #e2e8f0; background: #ffffff;">
-            <h3 style="margin:0; color:#0f172a; font-size:1.1rem; font-weight: 500;">
-                Preview Berkas
-            </h3>
-
-            <div style="display: flex; align-items: center; gap: 16px;">
-                {{-- Pintasan Download di Header --}}
-                <a 
-                    id="modal-header-download" 
-                    href="#" 
-                    download 
-                    title="Download Berkas" 
-                    style="color: #64748b; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: color 0.2s;" 
-                    onmouseover="this.style.color='#0f172a'" 
-                    onmouseout="this.style.color='#64748b'"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                </a>
-
-                {{-- Tombol Close Bergaya Pill --}}
-                <button
-                    type="button"
-                    onclick="tutupPreviewBerkas()"
-                    style="background: #ffffff; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: #475569; width: 48px; height: 32px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;"
-                    onmouseover="this.style.background='#f8fafc'; this.style.color='#0f172a'" 
-                    onmouseout="this.style.background='#ffffff'; this.style.color='#475569'"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+                                <td style="text-align:center;">
+                                    @if ($n->file_path)
+                                        <!-- Fungsi onclick diperbarui dengan parameter judul_rapat dinamis -->
+                                        <a href="javascript:void(0)"
+                                            onclick="previewBerkas('{{ asset('storage/' . $n->file_path) }}', '{{ addslashes($n->judul_rapat) }}')"
+                                            title="Lihat Berkas"
+                                            style="color:#475569; display:inline-flex; justify-content:center; align-items:center; background:transparent; border:none; padding:0; cursor:pointer; transition:color .2s ease;"
+                                            onmouseover="this.style.color='#2563eb'"
+                                            onmouseout="this.style.color='#475569'">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </a>
+                                    @else
+                                        <span style="color:#94a3b8; font-size:.9rem;">
+                                            Tidak ada
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" style="text-align:center; color:#64748b; padding:20px;">
+                                    Tidak ada notulensi yang ditemukan
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        {{-- ISI PREVIEW --}}
-        <div id="preview-berkas-content" style="flex: 1; overflow:auto; background:#f8fafc; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+        {{-- PAGINATION --}}
+        <div style="margin-top:16px; display:flex; justify-content:center;">
+            {{ $notulensi->links('vendor.pagination.custom') }}
+        </div>
+
+    </div>
+
+    {{-- =====================================================
+     MODAL PREVIEW BERKAS (UI BARU)
+===================================================== --}}
+    <div id="modal-preview-berkas"
+        style="position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.65); display:none; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+        <div
+            style="width:95%; max-width:1000px; height:90vh; background:white; border-radius:14px; overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,.25); display: flex; flex-direction: column;">
+            {{-- HEADER MODAL --}}
+            <div
+                style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid #e2e8f0; background: #ffffff;">
+                <h3 style="margin:0; color:#0f172a; font-size:1.1rem; font-weight: 500;">
+                    Preview Berkas
+                </h3>
+
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    {{-- Pintasan Download di Header --}}
+                    <a id="modal-header-download" href="#" download title="Download Berkas"
+                        style="color: #64748b; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: color 0.2s;"
+                        onmouseover="this.style.color='#0f172a'" onmouseout="this.style.color='#64748b'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </a>
+
+                    {{-- Tombol Close Bergaya Pill --}}
+                    <button type="button" onclick="tutupPreviewBerkas()"
+                        style="background: #ffffff; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: #475569; width: 48px; height: 32px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;"
+                        onmouseover="this.style.background='#f8fafc'; this.style.color='#0f172a'"
+                        onmouseout="this.style.background='#ffffff'; this.style.color='#475569'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            {{-- ISI PREVIEW --}}
+            <div id="preview-berkas-content"
+                style="flex: 1; overflow:auto; background:#f8fafc; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+            </div>
         </div>
     </div>
-</div>
 
-<script>
+    <script>
 /* =====================================================
    PREVIEW BERKAS
 ===================================================== */
@@ -346,5 +339,4 @@ document.getElementById('modal-preview-berkas')?.addEventListener('click', funct
     }
 });
 </script>
-
 @endsection

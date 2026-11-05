@@ -13,19 +13,14 @@ class Bidang extends Model
 
     protected $table = 'bidangs';
 
-    protected $fillable = [
-        'nama_bidang',
-        'akses_semua_bidang',
-    ];
+    protected $fillable = ['nama_bidang', 'akses_semua_bidang'];
 
     /**
      * Konfigurasi Activity Log Spatie
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()
-            ->logFillable()
-            ->logOnlyDirty();
+        return LogOptions::defaults()->logFillable()->logOnlyDirty();
     }
 
     public function users()

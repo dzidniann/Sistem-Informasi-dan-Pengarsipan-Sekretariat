@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\NamedUploads;
+
 use App\Models\Notulensi;
 use Illuminate\Http\Request;
 
@@ -21,15 +23,9 @@ class NotulensiController extends Controller
             });
         }
 
-        $notulensi = $query
-            ->latest('tanggal_rapat')
-            ->paginate(25)
-            ->withQueryString();
+        $notulensi = $query->latest('tanggal_rapat')->paginate(25)->withQueryString();
 
-        return view(
-            'sekretariat.notulensi.index',
-            compact('notulensi')
-        );
+        return view('sekretariat.notulensi.index', compact('notulensi'));
     }
 
     public function store(Request $request)
@@ -39,42 +35,34 @@ class NotulensiController extends Controller
             'tanggal_rapat' => 'required|date',
             'notulis' => 'required|string|max:100',
             'deskripsi_singkat' => 'nullable|string',
-            'foto' => 'nullable|image|max:5120',
-            'file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'foto' => 'nullable|image|max:4096',
+            'file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:8192',
         ]);
 
-        $fotoPath = $request->hasFile('foto')
-            ? $request->file('foto')->store('notulensi/foto', 'public')
-            : null;
+        $files = ['file_path' => [$request->file('file'), 'notulensi/file', 'public']];
+        if ($request->hasFile('foto')) {
+            $files['foto_path'] = [$request->file('foto'), 'notulensi/foto', 'public'];
+        }
 
-        $filePath = $request->file('file')->store(
-            'notulensi/file',
-            'public'
+        NamedUploads::create(
+            Notulensi::class,
+            [
+                'judul_rapat' => $request->judul_rapat,
+                'tanggal_rapat' => $request->tanggal_rapat,
+                'notulis' => $request->notulis,
+                'deskripsi_singkat' => $request->deskripsi_singkat,
+                'bidang_id' => auth()->user()->bidang_id,
+                'created_by' => auth()->id(),
+            ],
+            $files,
         );
 
-        Notulensi::create([
-            'judul_rapat' => $request->judul_rapat,
-            'tanggal_rapat' => $request->tanggal_rapat,
-            'notulis' => $request->notulis,
-            'deskripsi_singkat' => $request->deskripsi_singkat,
-            'foto_path' => $fotoPath,
-            'file_path' => $filePath,
-            'bidang_id' => auth()->user()->bidang_id,
-            'created_by' => auth()->id(),
-        ]);
-
-        return back()->with(
-            'success',
-            'Notulensi berhasil disimpan'
-        );
+        return back()->with('success', 'Notulensi berhasil disimpan');
     }
 
     public function show(Notulensi $notulensi)
     {
-        return view(
-            'sekretariat.notulensi.show',
-            compact('notulensi')
-        );
+        return view('sekretariat.notulensi.show', compact('notulensi'));
     }
 
     /*
@@ -87,9 +75,7 @@ class NotulensiController extends Controller
     {
         abort_unless($notulensi->file_path, 404);
 
-        $path = storage_path(
-            'app/public/' . $notulensi->file_path
-        );
+        $path = storage_path('app/public/' . $notulensi->file_path);
 
         abort_unless(file_exists($path), 404);
 

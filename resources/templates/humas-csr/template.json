@@ -1,0 +1,323 @@
+{
+    "source": "https://docs.google.com/spreadsheets/d/1DLJlC4uGpX_mIOmWKTnc4oXwFW6nzQcYC-LqW1ZWTjk/edit#gid=384698074",
+    "sheet_format": {
+        "customHeight": "1",
+        "defaultColWidth": "12.63",
+        "defaultRowHeight": "15.75"
+    },
+    "columns": [
+        {
+            "customWidth": "1",
+            "min": "2",
+            "max": "2",
+            "width": "15.88"
+        },
+        {
+            "customWidth": "1",
+            "min": "3",
+            "max": "3",
+            "width": "18.5"
+        },
+        {
+            "customWidth": "1",
+            "min": "4",
+            "max": "4",
+            "width": "25.13"
+        },
+        {
+            "customWidth": "1",
+            "min": "8",
+            "max": "8",
+            "width": "19.0"
+        },
+        {
+            "customWidth": "1",
+            "min": "9",
+            "max": "9",
+            "width": "16.38"
+        },
+        {
+            "customWidth": "1",
+            "min": "10",
+            "max": "10",
+            "width": "17.5"
+        }
+    ],
+    "merges": [
+        "A2:D2",
+        "A3:A4",
+        "B3:D3",
+        "E3:L3"
+    ],
+    "headers": [
+        {
+            "attributes": {
+                "r": "1"
+            },
+            "cells": [
+                {
+                    "ref": "A1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "B1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "C1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "D1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "E1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "F1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "G1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "H1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "I1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "J1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "K1",
+                    "style": 1,
+                    "value": ""
+                },
+                {
+                    "ref": "L1",
+                    "style": 1,
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "attributes": {
+                "r": "2"
+            },
+            "cells": [
+                {
+                    "ref": "A2",
+                    "style": 2,
+                    "value": "{MONTH}"
+                },
+                {
+                    "ref": "E2",
+                    "style": 3,
+                    "value": ""
+                },
+                {
+                    "ref": "F2",
+                    "style": 3,
+                    "value": ""
+                },
+                {
+                    "ref": "G2",
+                    "style": 3,
+                    "value": ""
+                },
+                {
+                    "ref": "H2",
+                    "style": 3,
+                    "value": ""
+                },
+                {
+                    "ref": "I2",
+                    "style": 3,
+                    "value": ""
+                },
+                {
+                    "ref": "J2",
+                    "style": 3,
+                    "value": ""
+                },
+                {
+                    "ref": "K2",
+                    "style": 3,
+                    "value": ""
+                },
+                {
+                    "ref": "L2",
+                    "style": 3,
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "attributes": {
+                "r": "3"
+            },
+            "cells": [
+                {
+                    "ref": "A3",
+                    "style": 5,
+                    "value": "NO"
+                },
+                {
+                    "ref": "B3",
+                    "style": 6,
+                    "value": "INFORMASI PEMOHON"
+                },
+                {
+                    "ref": "C3",
+                    "style": 7,
+                    "value": ""
+                },
+                {
+                    "ref": "D3",
+                    "style": 8,
+                    "value": ""
+                },
+                {
+                    "ref": "E3",
+                    "style": 6,
+                    "value": "INFORMASI PERMOHONAN"
+                },
+                {
+                    "ref": "F3",
+                    "style": 7,
+                    "value": ""
+                },
+                {
+                    "ref": "G3",
+                    "style": 7,
+                    "value": ""
+                },
+                {
+                    "ref": "H3",
+                    "style": 7,
+                    "value": ""
+                },
+                {
+                    "ref": "I3",
+                    "style": 7,
+                    "value": ""
+                },
+                {
+                    "ref": "J3",
+                    "style": 7,
+                    "value": ""
+                },
+                {
+                    "ref": "K3",
+                    "style": 7,
+                    "value": ""
+                },
+                {
+                    "ref": "L3",
+                    "style": 8,
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "attributes": {
+                "r": "4"
+            },
+            "cells": [
+                {
+                    "ref": "A4",
+                    "style": 9,
+                    "value": ""
+                },
+                {
+                    "ref": "B4",
+                    "style": 10,
+                    "value": "PEMOHON"
+                },
+                {
+                    "ref": "C4",
+                    "style": 5,
+                    "value": "NO SURAT"
+                },
+                {
+                    "ref": "D4",
+                    "style": 5,
+                    "value": "NAMA KEGIATAN"
+                },
+                {
+                    "ref": "E4",
+                    "style": 10,
+                    "value": "PROSES"
+                },
+                {
+                    "ref": "F4",
+                    "style": 10,
+                    "value": "KELUAR"
+                },
+                {
+                    "ref": "G4",
+                    "style": 10,
+                    "value": "NO VOUCHER"
+                },
+                {
+                    "ref": "H4",
+                    "style": 10,
+                    "value": "STATUS"
+                },
+                {
+                    "ref": "I4",
+                    "style": 10,
+                    "value": "KATEGORI"
+                },
+                {
+                    "ref": "J4",
+                    "style": 10,
+                    "value": "LUARAN"
+                },
+                {
+                    "ref": "K4",
+                    "style": 10,
+                    "value": "NOMINAL"
+                },
+                {
+                    "ref": "L4",
+                    "style": 10,
+                    "value": "KETERANGAN"
+                }
+            ]
+        }
+    ],
+    "data_styles": {
+        "A": 12,
+        "B": 12,
+        "C": 12,
+        "D": 12,
+        "E": 15,
+        "F": 12,
+        "G": 16,
+        "H": 20,
+        "I": 20,
+        "J": 20,
+        "K": 22,
+        "L": 24
+    },
+    "minimum_data_row_height": 36.75,
+    "base_style_count": 75
+}

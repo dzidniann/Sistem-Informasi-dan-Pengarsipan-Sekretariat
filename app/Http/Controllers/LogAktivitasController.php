@@ -12,21 +12,11 @@ class LogAktivitasController extends Controller
     {
         $user = auth()->user();
 
-        $query = Activity::with(['causer', 'subject'])
-            ->latest('created_at');
+        $query = Activity::with(['causer', 'subject'])->latest('created_at');
 
-        // Admin boleh melihat semua log.
-        // Selain admin, hanya melihat log user dengan role yang sama.
-        if ($user->role->nama !== 'admin') {
-            $roleId = $user->role_id;
-
-            $query->whereHasMorph(
-                'causer',
-                [User::class],
-                function ($q) use ($roleId) {
-                    $q->where('role_id', $roleId);
-                }
-            );
+        // Only Super Admin can view every user's activity.
+        if ($user->role->nama !== 'super-admin') {
+            $query->whereMorphedTo('causer', $user);
         }
 
         if ($request->filled('cari')) {
@@ -35,50 +25,33 @@ class LogAktivitasController extends Controller
             $query->where(function ($q) use ($kataKunci) {
                 $q->where('description', 'like', "%{$kataKunci}%")
                     ->orWhere('subject_type', 'like', "%{$kataKunci}%")
-                    ->orWhereHasMorph(
-                        'causer',
-                        [User::class],
-                        function ($sub) use ($kataKunci) {
-                            $sub->where('name', 'like', "%{$kataKunci}%");
-                        }
-                    );
+                    ->orWhereHasMorph('causer', [User::class], function ($sub) use ($kataKunci) {
+                        $sub->where('name', 'like', "%{$kataKunci}%");
+                    });
             });
         }
 
-        $logs = $query
-            ->paginate(50)
-            ->withQueryString();
+        $logs = $query->paginate(50)->withQueryString();
 
         $layout = $this->layoutSesuaiRole();
 
-        return view(
-            'log-aktivitas.index',
-            compact('logs', 'layout')
-        );
+        return view('log-aktivitas.index', compact('logs', 'layout'));
     }
 
     public function show(Activity $log)
     {
         $user = auth()->user();
 
-        // Admin boleh melihat detail semua log.
-        // Selain admin, hanya boleh membuka log dari role yang sama.
+        // Keep direct detail access consistent with the list's ownership rule.
         if ($user->role->nama !== 'super-admin') {
-            if (
-                !$log->causer ||
-                !$log->causer instanceof User ||
-                $log->causer->role_id !== $user->role_id
-            ) {
+            if (!$log->causer || !($log->causer instanceof User) || !$log->causer->is($user)) {
                 abort(403);
             }
         }
 
         $layout = $this->layoutSesuaiRole();
 
-        return view(
-            'log-aktivitas.show',
-            compact('log', 'layout')
-        );
+        return view('log-aktivitas.show', compact('log', 'layout'));
     }
 
     private function layoutSesuaiRole(): string
@@ -86,6 +59,9 @@ class LogAktivitasController extends Controller
         return match (auth()->user()->role->nama) {
             'super-admin' => 'admin.layout',
             'sekretariat' => 'sekretariat.layout',
+            'humas' => 'humas.layout',
+            'legal-admin' => 'legal.layout',
+            'employee' => 'employee.layout',
             default => 'staf.layout',
         };
     }
