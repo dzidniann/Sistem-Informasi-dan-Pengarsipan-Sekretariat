@@ -134,7 +134,7 @@ Migration penggantian nama sudah dijalankan pada database lokal tanggal 20 Oktob
 ```powershell
 php artisan migrate
 php artisan optimize:clear
-php artisan storage:link
+php artisan files:protect-public --dry-run
 ```
 
 Jangan memakai `migrate:fresh` untuk memperbarui database yang berisi data. `LegalSeeder` mengisi role/bidang dan akun sampel; jangan menjadikannya langkah pembaruan production tanpa memisahkan akun sampel. Tidak ada dependency baru khusus perubahan antarmuka terbaru.
@@ -199,3 +199,5 @@ Judul tab, identitas sidebar, dan heading dashboard menjadi **Sub Bidang Hukum d
 Migrasi tambahan sudah dipasang di database lokal dan Docker pada task ini, setelah keduanya dicadangkan. Tidak dibuat data contoh. Untuk deployment lain jalankan `php artisan migrate --force`, kemudian bersihkan cache route/view. Tidak perlu rebuild image untuk modul ini.
 
 Verifikasi: **56 tes / 898 assertions lulus**, termasuk CRUD Tata Kelola, preview/download, penolakan non-PDF, batas tepat 5 MB dan di atasnya, otorisasi, validasi path privat, rollback kegagalan penggantian file, serta regresi modul lama. Form desktop 1440 px dan mobile 390 px diperiksa: tepat tiga field dan tidak ada horizontal overflow.
+
+Pembaruan keamanan 5 November 2026: registrasi publik ditutup dan unggahan lama dipindahkan ke storage privat dengan pemeriksaan akses pada URL berkas. Jangan membuat symlink `public/storage`. Lihat [SECURITY_HARDENING.md](SECURITY_HARDENING.md).

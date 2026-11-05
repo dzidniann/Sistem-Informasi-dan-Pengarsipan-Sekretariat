@@ -35,6 +35,7 @@ class SecretariatArchiveAccessTest extends TestCase
             }
         }
         Storage::fake('public');
+        Storage::fake('protected');
     }
 
     private function user(Bidang $bidang, string $role = 'sekretariat'): User

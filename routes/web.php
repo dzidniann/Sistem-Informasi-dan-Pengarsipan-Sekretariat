@@ -77,6 +77,9 @@ Route::middleware(['auth', 'aktif', 'nocache', 'role:staf-bidang'])->group(funct
 });
 
 Route::middleware(['auth', 'aktif', 'nocache'])->group(function () {
+    Route::get('storage/{path}', \App\Http\Controllers\ProtectedUploadController::class)
+        ->where('path', '.*')->name('uploads.show');
+
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
 
     Route::post('arsip', [ArsipController::class, 'store'])->name('arsip.store');

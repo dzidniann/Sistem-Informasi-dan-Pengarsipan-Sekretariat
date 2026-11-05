@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Storage URLs must pass authentication even if a legacy storage link exists.
+    RewriteRule ^storage(?:/|$) index.php [L,QSA]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

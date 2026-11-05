@@ -1,13 +1,13 @@
 # Preview dan download berkas
 
-Diperbarui: **27 Oktober 2026**, berdasarkan source aplikasi. Jalur penyimpanan publik dan privat tetap berbeda; perubahan desain tidak memindahkan file lama.
+Diperbarui: **5 November 2026**. Unggahan lama sudah dipindahkan ke penyimpanan privat; URL lama diperiksa oleh Laravel. Rincian keamanan dan migrasi ada di [SECURITY_HARDENING.md](SECURITY_HARDENING.md).
 
 ## Lokasi penyimpanan
 
 | Modul | Storage | Cara akses |
 |---|---|---|
-| Arsip, Nomor Surat, Notulensi Sekretariat | Disk `public`, `storage/app/public` | URL `/storage/...`; beberapa halaman juga menyediakan controller pembuka berkas |
-| Dokumen Hukum, lampiran konsultasi dan pesan diskusi | Disk `public`, `storage/app/public` | URL `/storage/...`, termasuk tombol pada Perpustakaan |
+| Arsip, Nomor Surat, Notulensi Sekretariat | Disk `protected`, `storage/app/protected-uploads` | URL `/storage/...` melalui login dan pemeriksaan bidang/role |
+| Dokumen Hukum, lampiran konsultasi dan pesan diskusi | Disk `protected`, `storage/app/protected-uploads` | URL `/storage/...` melalui otorisasi; Perpustakaan hanya mengizinkan dokumen terpublikasi yang masih berlaku |
 | Kegiatan dan Notulensi Sub Bidang Hukum | Disk `local`, `storage/app/legal-private` | Endpoint lampiran yang memerlukan login dan role berwenang |
 | PDF laporan kegiatan bulanan Hukum | Dibuat DomPDF dari database dan berkas lokal ketika diminta | Endpoint preview/download laporan, bukan URL upload `/storage` |
 | Surat/proposal, bukti, foto CSR Humas | Disk `local`, `storage/app/humas-private` | Endpoint role Humas yang memeriksa bidang dan kepemilikan lampiran pada record |
@@ -17,24 +17,16 @@ Dokumen Hukum utama (`legal_documents.file_path`) tidak sama dengan lampiran pri
 
 Lampiran CSR menggunakan `/humas/csr/{csr}/attachments/{attachment}`. PDF/JPG/PNG dapat ditampilkan inline; `?download=1` memaksa unduhan. Word diunduh. `HumasPrivateFiles` memvalidasi prefix, traversal, `realpath`, keberadaan file, dan batas direktori privat. Detail batas unggahan dan transaksi file terdapat di [HUMAS_CSR_MODULE.md](HUMAS_CSR_MODULE.md).
 
-## Penghubung storage publik
+## URL storage yang dilindungi
 
-Untuk `php artisan serve` atau Apache, setelah checkout/setup baru jalankan dari root aplikasi:
+URL `/storage/{path}` dilayani `ProtectedUploadController` setelah login, pemeriksaan akun aktif, dan otorisasi record. Nginx/Apache meneruskan URL tersebut ke Laravel. Symlink `public/storage` tidak diperlukan dan jangan dibuat kembali. File baru berada pada disk `protected`.
 
-```powershell
-php artisan storage:link
-```
+Untuk instalasi lama, gunakan `php artisan files:protect-public --dry-run`, cadangkan database, lalu jalankan `files:protect-public` sebagai pengguna aplikasi dalam jendela pemeliharaan. Command mencadangkan dan memeriksa checksum file sebelum menghapus salinan publik. Lepaskan tautan `public/storage` yang lama sesudahnya tanpa menghapus direktori target. Lihat langkah lengkap di [SECURITY_HARDENING.md](SECURITY_HARDENING.md).
 
-Pada Windows, pastikan `public/storage` benar-benar menunjuk ke `storage/app/public`. Laravel dapat mencetak pesan sukses walaupun perintah Windows menampilkan `Access is denied`; periksa junction/link dan hak aksesnya. Jangan menyalin upload ke folder public secara manual untuk menggantikan penghubung.
-
-Konfigurasi Nginx Docker di `docker/nginx/default.conf` menggunakan alias `/storage/` ke `/var/www/html/storage/app/public/`, sehingga tidak bergantung pada junction Windows. Setelah perubahan konfigurasi server:
-
-```powershell
+```sh
 docker compose exec webserver nginx -t
 docker compose exec webserver nginx -s reload
 ```
-
-Reload hanya dilakukan setelah pemeriksaan konfigurasi berhasil. Volume aplikasi/webserver harus menunjuk ke data upload yang sama.
 
 ## Lampiran privat kegiatan/notulensi Hukum
 
@@ -58,7 +50,7 @@ PDF hanya memakai dokumentasi dari kegiatan, bukan file/foto notulensi. `LegalPr
 ## Jika berkas tidak ditemukan
 
 1. Tentukan apakah URL berasal dari storage publik, endpoint privat, atau pembangkitan laporan.
-2. Untuk URL publik, cocokkan nilai path di database dengan file di `storage/app/public`, lalu periksa link/alias dan volume server.
+2. Untuk URL `/storage/...`, periksa login, role/bidang/pemilik record, dan file di `storage/app/protected-uploads`. Path database tetap memakai nama relatif lama; tidak ada alias statis publik.
 3. Untuk endpoint privat, cocokkan ID record, jenis modul, field yang diizinkan, dan keberadaan file di root `legal-private`. Path tidak sah atau file hilang memang menghasilkan 404.
 4. Jika file fisik hilang, pulihkan backup atau unggah ulang melalui modul yang sesuai. Link storage tidak dapat memulihkan file yang hilang.
 5. Untuk PDF laporan yang gagal dibuat, periksa parameter periode, log Laravel, hak baca berkas, dan konfigurasi PHP; masalahnya tidak selalu berupa link `/storage`.

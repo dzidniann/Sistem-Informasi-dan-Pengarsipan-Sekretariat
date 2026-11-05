@@ -18,3 +18,5 @@
 .phpunit.result.cache
 Dockerfile
 docker-compose.yml
+
+/.dist

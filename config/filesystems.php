@@ -28,6 +28,12 @@ return [
     */
 
     'disks' => [
+        'protected' => [
+            'driver' => 'local',
+            'root' => storage_path('app/protected-uploads'),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
@@ -66,7 +72,6 @@ return [
     |
     */
 
-    'links' => [
-        public_path('storage') => storage_path('app/public'),
-    ],
+    // Upload URLs are handled by Laravel; never expose an upload directory by symlink.
+    'links' => [],
 ];

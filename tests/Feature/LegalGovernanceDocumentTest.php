@@ -41,6 +41,7 @@ class LegalGovernanceDocumentTest extends TestCase
             }
         }
         Storage::fake('public');
+        Storage::fake('protected');
         Storage::fake('local');
     }
 

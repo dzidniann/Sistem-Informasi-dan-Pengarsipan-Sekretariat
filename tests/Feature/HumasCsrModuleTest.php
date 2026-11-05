@@ -35,6 +35,7 @@ class HumasCsrModuleTest extends TestCase
             }
         }
         Storage::fake('public');
+        Storage::fake('protected');
         Storage::fake('local');
         $this->seed(\Database\Seeders\HumasSeeder::class);
     }

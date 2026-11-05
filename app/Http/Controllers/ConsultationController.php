@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\NamedUploads;
-
-use Illuminate\Http\Request;
 use App\Models\Consultation;
 use App\Models\ConsultationMessage;
 use App\Models\LegalNotification;
+use App\Services\NamedUploads;
+use Illuminate\Http\Request;
 
 class ConsultationController extends Controller
 {
@@ -21,7 +20,7 @@ class ConsultationController extends Controller
 
         $query = Consultation::with(['user', 'assignedLegal']);
 
-        if (!$isLegalAdmin) {
+        if (! $isLegalAdmin) {
             // Employee hanya melihat konsultasi sendiri
             $query->byUser($user->id);
         }
@@ -32,7 +31,7 @@ class ConsultationController extends Controller
             $query->where(function ($q) use ($kataKunci) {
                 $q->where('title', 'like', "%{$kataKunci}%")->orWhereHas(
                     'user',
-                    fn($sub) => $sub->where('name', 'like', "%{$kataKunci}%"),
+                    fn ($sub) => $sub->where('name', 'like', "%{$kataKunci}%"),
                 );
             });
         }
@@ -87,7 +86,7 @@ class ConsultationController extends Controller
                 'status' => Consultation::STATUS_WAITING_REVIEW,
             ],
             $request->hasFile('attachment')
-                ? ['attachment' => [$request->file('attachment'), 'consultations', 'public']]
+                ? ['attachment' => [$request->file('attachment'), 'consultations', 'protected']]
                 : [],
         );
 
@@ -117,7 +116,7 @@ class ConsultationController extends Controller
         $isLegalAdmin = $user->hasRole('legal-admin');
 
         // Employee hanya bisa lihat konsultasi sendiri
-        if (!$isLegalAdmin) {
+        if (! $isLegalAdmin) {
             abort_unless($consultation->user_id === $user->id, 403);
         }
 
@@ -138,7 +137,7 @@ class ConsultationController extends Controller
         $isLegalAdmin = $user->hasRole('legal-admin');
 
         // Employee hanya bisa kirim pesan di konsultasi sendiri
-        if (!$isLegalAdmin) {
+        if (! $isLegalAdmin) {
             abort_unless($consultation->user_id === $user->id, 403);
         }
 
@@ -155,7 +154,7 @@ class ConsultationController extends Controller
                 'message' => $request->message,
             ],
             $request->hasFile('attachment')
-                ? ['attachment' => [$request->file('attachment'), 'consultation-messages', 'public']]
+                ? ['attachment' => [$request->file('attachment'), 'consultation-messages', 'protected']]
                 : [],
         );
 
@@ -230,7 +229,7 @@ class ConsultationController extends Controller
         LegalNotification::kirim(
             $consultation->user_id,
             LegalNotification::TYPE_CONSULTATION_SCHEDULE,
-            "Konsultasi '{$consultation->title}' dijadwalkan pada " .
+            "Konsultasi '{$consultation->title}' dijadwalkan pada ".
                 \Carbon\Carbon::parse($request->schedule)->translatedFormat('d M Y H:i'),
             LegalNotification::PRIORITY_HIGH,
         );

@@ -148,7 +148,7 @@ Pembaruan 26 Oktober 2026: halaman dan menu Notifikasi beserta route/controller 
 
 ## Penyimpanan dan pekerjaan terjadwal
 
-Lampiran kegiatan/notulensi Hukum memakai `storage/app/legal-private` dan controller terotorisasi, dengan validasi path canonical/MIME. Modul lama masih menyimpan berkas pada `storage/app/public`; junction `/storage` atau alias Nginx diperlukan. Kondisi ini tetap membawa temuan akses URL langsung A01. Lihat [FILE_ACCESS.md](FILE_ACCESS.md).
+Lampiran kegiatan/notulensi Hukum memakai `storage/app/legal-private` dan controller terotorisasi, dengan validasi path canonical/MIME. Modul lama memakai disk `protected` dan URL `/storage` terotorisasi; berkas lama dimigrasikan tanpa mengubah path database. Symlink/alias statis publik tidak digunakan lagi. Lihat [FILE_ACCESS.md](FILE_ACCESS.md).
 
 `app/Console/Kernel.php` menjadwalkan:
 
@@ -168,7 +168,7 @@ composer install
 npm install
 npm run build
 php artisan migrate
-php artisan storage:link
+php artisan files:protect-public --dry-run
 php artisan optimize:clear
 ```
 
@@ -193,3 +193,5 @@ Pengujian terpilih mencakup modul Legal, laporan kegiatan, berkas privat, katego
 [AUDIT_SISTEM_2026-10-16.md](AUDIT_SISTEM_2026-10-16.md) tetap menjadi catatan temuan keamanan/fungsional. A11 sudah diperbaiki; temuan lain belum boleh ditandai selesai hanya karena desain dan test regresi fitur berubah.
 
 Verifikasi tambahan 26 Oktober 2026: jalankan perintah suite di atas dengan tambahan `tests/Feature/SecretariatArchiveAccessTest.php`. Hasil gabungan: **34 test / 583 assertion lulus**; termasuk validasi seluruh isian unggah dokumen dan isolasi arsip Sekretariat.
+
+Pembaruan keamanan 5 November 2026: registrasi publik ditutup dan unggahan lama dipindahkan ke storage privat dengan pemeriksaan akses pada URL berkas. Jangan membuat symlink `public/storage`. Lihat [SECURITY_HARDENING.md](SECURITY_HARDENING.md).

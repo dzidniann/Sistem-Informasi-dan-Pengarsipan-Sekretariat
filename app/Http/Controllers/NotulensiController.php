@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\NamedUploads;
-
 use App\Models\Notulensi;
+use App\Services\NamedUploads;
 use Illuminate\Http\Request;
 
 class NotulensiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Notulensi::with('pembuat');
+        $query = Notulensi::with('pembuat')->where('bidang_id', auth()->user()->bidang_id);
 
         if ($request->filled('cari')) {
             $kataKunci = $request->cari;
@@ -39,9 +38,9 @@ class NotulensiController extends Controller
             'file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:8192',
         ]);
 
-        $files = ['file_path' => [$request->file('file'), 'notulensi/file', 'public']];
+        $files = ['file_path' => [$request->file('file'), 'notulensi/file', 'protected']];
         if ($request->hasFile('foto')) {
-            $files['foto_path'] = [$request->file('foto'), 'notulensi/foto', 'public'];
+            $files['foto_path'] = [$request->file('foto'), 'notulensi/foto', 'protected'];
         }
 
         NamedUploads::create(
@@ -62,6 +61,8 @@ class NotulensiController extends Controller
 
     public function show(Notulensi $notulensi)
     {
+        abort_unless(auth()->user()->bidang_id === $notulensi->bidang_id, 404);
+
         return view('sekretariat.notulensi.show', compact('notulensi'));
     }
 
@@ -73,17 +74,8 @@ class NotulensiController extends Controller
 
     public function berkas(Notulensi $notulensi)
     {
-        abort_unless($notulensi->file_path, 404);
+        abort_unless(auth()->user()->bidang_id === $notulensi->bidang_id, 404);
 
-        $path = storage_path('app/public/' . $notulensi->file_path);
-
-        abort_unless(file_exists($path), 404);
-
-        $mimeType = mime_content_type($path);
-
-        return response()->file($path, [
-            'Content-Type' => $mimeType,
-            'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
-        ]);
+        return \App\Services\ProtectedUploads::response($notulensi->file_path ?? '', request()->boolean('download'));
     }
 }

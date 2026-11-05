@@ -7,21 +7,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, LogsActivity;
+    use HasApiTokens, HasFactory, LogsActivity, Notifiable;
 
     protected $fillable = ['name', 'email', 'password', 'role_id', 'bidang_id', 'is_active'];
+
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * Konfigurasi Activity Log Spatie
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logFillable()->logOnlyDirty();
+        return LogOptions::defaults()->logOnly(['name', 'email', 'role_id', 'bidang_id', 'is_active'])->logOnlyDirty();
     }
 
     public function role()

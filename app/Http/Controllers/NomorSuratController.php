@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\NamedUploads;
-
 use App\Models\ArsipSurat;
 use App\Models\KategoriSurat;
+use App\Services\NamedUploads;
 use App\Services\NomorSuratService;
 use Illuminate\Http\Request;
 
@@ -21,8 +20,8 @@ class NomorSuratController extends Controller
                 $q->where('full_nomor', 'like', "%{$kataKunci}%")
                     ->orWhere('perihal', 'like', "%{$kataKunci}%")
                     ->orWhere('tujuan', 'like', "%{$kataKunci}%")
-                    ->orWhereHas('kategori', fn($sub) => $sub->where('nama_kategori', 'like', "%{$kataKunci}%"))
-                    ->orWhereHas('perilis', fn($sub) => $sub->where('name', 'like', "%{$kataKunci}%"));
+                    ->orWhereHas('kategori', fn ($sub) => $sub->where('nama_kategori', 'like', "%{$kataKunci}%"))
+                    ->orWhereHas('perilis', fn ($sub) => $sub->where('name', 'like', "%{$kataKunci}%"));
             });
         }
 
@@ -73,8 +72,8 @@ class NomorSuratController extends Controller
                 $q->where('full_nomor', 'like', "%{$kataKunci}%")
                     ->orWhere('perihal', 'like', "%{$kataKunci}%")
                     ->orWhere('tujuan', 'like', "%{$kataKunci}%")
-                    ->orWhereHas('kategori', fn($sub) => $sub->where('nama_kategori', 'like', "%{$kataKunci}%"))
-                    ->orWhereHas('perilis', fn($sub) => $sub->where('name', 'like', "%{$kataKunci}%"));
+                    ->orWhereHas('kategori', fn ($sub) => $sub->where('nama_kategori', 'like', "%{$kataKunci}%"))
+                    ->orWhereHas('perilis', fn ($sub) => $sub->where('name', 'like', "%{$kataKunci}%"));
             });
         }
 
@@ -127,7 +126,7 @@ class NomorSuratController extends Controller
                 'tujuan' => $request->tujuan,
                 'catatan' => $request->catatan,
             ],
-            $request->hasFile('file') ? ['file_path' => [$request->file('file'), 'nomor-surat', 'public']] : [],
+            $request->hasFile('file') ? ['file_path' => [$request->file('file'), 'nomor-surat', 'protected']] : [],
         );
 
         if ($hasil->is_backdate) {
@@ -165,7 +164,7 @@ class NomorSuratController extends Controller
             $data['file_path'] = NamedUploads::store(
                 $request->file('file'),
                 'nomor-surat',
-                'public',
+                'protected',
                 (int) $arsipSurat->getKey(),
                 'file_path',
             );
@@ -175,6 +174,6 @@ class NomorSuratController extends Controller
 
         return redirect()
             ->route('nomor-surat.show', $arsipSurat)
-            ->with('success', 'Detail surat berhasil diperbarui: ' . $arsipSurat->full_nomor);
+            ->with('success', 'Detail surat berhasil diperbarui: '.$arsipSurat->full_nomor);
     }
 }

@@ -1,5 +1,9 @@
 # Audit SSO PDAM — 16 Oktober 2026
 
+## Tindak lanjut 5 November 2026
+
+A01 ditangani melalui storage privat, otorisasi `/storage`, dan migrasi 21 file yang dicadangkan serta diverifikasi checksum. A02 ditangani dengan penutupan registrasi publik dan penghapusan fallback role/bidang pertama. Pencatatan password pada aktivitas baru dan serialisasi User diperbaiki untuk A03; data log lama tidak dihapus. A04 dicegah untuk unggahan Git baru melalui ignore rules; riwayat konfigurasi lama di GitHub masih memerlukan persetujuan penulisan ulang branch. A05 ditangani dengan database pengujian SQLite di memori. 73 tes / 1037 assertions lulus. Ini bukan penutupan seluruh temuan audit; lihat [SECURITY_HARDENING.md](SECURITY_HARDENING.md).
+
 ## Tindak lanjut 26 Oktober 2026 — cakupan arsip dan rekap
 
 **A09 sudah diperbaiki:** endpoint `/dashboard/rekap-bulanan` sekarang memakai `auth`, `aktif`, dan `nocache`, memvalidasi bulan/tahun, serta menyaring data menurut hak akses akun. Bukti audit lama yang mengharapkan akses tamu dihapus dari `SystemAuditTest`; ekspektasi aman ditempatkan pada `tests/Feature/SecretariatArchiveAccessTest.php`.

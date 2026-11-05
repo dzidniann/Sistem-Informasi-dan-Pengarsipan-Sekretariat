@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\NamedUploads;
-
-use Illuminate\Http\Request;
-use App\Models\LegalDocument;
 use App\Models\LegalCategory;
+use App\Models\LegalDocument;
 use App\Models\LegalDocumentHistory;
-use App\Models\LegalNotification;
+use App\Services\NamedUploads;
+use Illuminate\Http\Request;
 
 class LegalDocumentController extends Controller
 {
@@ -23,7 +21,7 @@ class LegalDocumentController extends Controller
                 $q->where('name', 'like', "%{$kataKunci}%")
                     ->orWhere('department', 'like', "%{$kataKunci}%")
                     ->orWhere('pic', 'like', "%{$kataKunci}%")
-                    ->orWhereHas('category', fn($sub) => $sub->where('name', 'like', "%{$kataKunci}%"));
+                    ->orWhereHas('category', fn ($sub) => $sub->where('name', 'like', "%{$kataKunci}%"));
             });
         }
 
@@ -99,7 +97,7 @@ class LegalDocumentController extends Controller
                 'version' => '1.0',
                 'created_by' => $user->id,
             ],
-            ['file_path' => [$request->file('file'), 'legal-documents', 'public']],
+            ['file_path' => [$request->file('file'), 'legal-documents', 'protected']],
         );
 
         // Catat history
@@ -107,7 +105,7 @@ class LegalDocumentController extends Controller
             'document_id' => $document->id,
             'version' => '1.0',
             'action' => 'Dokumen dibuat',
-            'description' => 'Dokumen baru diunggah oleh ' . $user->name,
+            'description' => 'Dokumen baru diunggah oleh '.$user->name,
             'created_by' => $user->id,
         ]);
 
@@ -154,7 +152,7 @@ class LegalDocumentController extends Controller
             $path = NamedUploads::store(
                 $request->file('file'),
                 'legal-documents',
-                'public',
+                'protected',
                 $document->id,
                 'file_path',
             );
@@ -186,7 +184,7 @@ class LegalDocumentController extends Controller
             'document_id' => $document->id,
             'version' => $document->version,
             'action' => $actionText,
-            'description' => $actionText . ' oleh ' . $user->name,
+            'description' => $actionText.' oleh '.$user->name,
             'created_by' => $user->id,
         ]);
 
@@ -225,7 +223,7 @@ class LegalDocumentController extends Controller
     {
         $user = auth()->user();
 
-        if (!$document->canPublish()) {
+        if (! $document->canPublish()) {
             return back()->with(
                 'error',
                 'Dokumen hanya bisa dipublish jika berstatus ACTIVE atau EXPIRING_SOON dan belum kedaluwarsa',
@@ -241,7 +239,7 @@ class LegalDocumentController extends Controller
             'document_id' => $document->id,
             'version' => $document->version,
             'action' => 'Dokumen dipublish',
-            'description' => 'Dokumen dipublish ke perpustakaan oleh ' . $user->name,
+            'description' => 'Dokumen dipublish ke perpustakaan oleh '.$user->name,
             'created_by' => $user->id,
         ]);
 
@@ -264,7 +262,7 @@ class LegalDocumentController extends Controller
             'document_id' => $document->id,
             'version' => $document->version,
             'action' => 'Dokumen di-unpublish',
-            'description' => 'Dokumen dihapus dari perpustakaan oleh ' . $user->name,
+            'description' => 'Dokumen dihapus dari perpustakaan oleh '.$user->name,
             'created_by' => $user->id,
         ]);
 

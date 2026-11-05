@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\NamedUploads;
-
 use App\Models\Arsip;
 use App\Models\KategoriArsip;
+use App\Services\NamedUploads;
 use Illuminate\Http\Request;
 
 class ArsipController extends Controller
@@ -17,7 +16,7 @@ class ArsipController extends Controller
 
         $cakupanSendiri = $user->hasRole('sekretariat') || $request->cakupan === 'sendiri';
 
-        if (!$user->bisaAksesSemuaBidang() || $cakupanSendiri) {
+        if (! $user->bisaAksesSemuaBidang() || $cakupanSendiri) {
             $query->where('bidang_id', $user->bidang_id);
         }
 
@@ -25,9 +24,9 @@ class ArsipController extends Controller
             $kataKunci = $request->cari;
             $query->where(function ($q) use ($kataKunci) {
                 $q->where('judul_file', 'like', "%{$kataKunci}%")
-                    ->orWhereHas('kategori', fn($sub) => $sub->where('nama', 'like', "%{$kataKunci}%"))
-                    ->orWhereHas('bidang', fn($sub) => $sub->where('nama_bidang', 'like', "%{$kataKunci}%"))
-                    ->orWhereHas('uploader', fn($sub) => $sub->where('name', 'like', "%{$kataKunci}%"));
+                    ->orWhereHas('kategori', fn ($sub) => $sub->where('nama', 'like', "%{$kataKunci}%"))
+                    ->orWhereHas('bidang', fn ($sub) => $sub->where('nama_bidang', 'like', "%{$kataKunci}%"))
+                    ->orWhereHas('uploader', fn ($sub) => $sub->where('name', 'like', "%{$kataKunci}%"));
             });
         }
 
@@ -64,7 +63,7 @@ class ArsipController extends Controller
                 'bidang_id' => $kategori->bidang_id,
                 'uploaded_by' => $user->id,
             ],
-            ['file_path' => [$request->file('file'), 'arsip/' . $kategori->id, 'public']],
+            ['file_path' => [$request->file('file'), 'arsip/'.$kategori->id, 'protected']],
         );
 
         return back()->with('success', 'Berkas berhasil diunggah');

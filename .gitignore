@@ -27,3 +27,14 @@ yarn-error.log
 
 /tmp/responsive-qa/
 /tmp/csr-template-work/
+
+# Local configuration, build workspaces, and temporary artifacts
+.env.*
+!.env.example
+!.env.docker.example
+/.dist/
+/tmp/
+/.vs/
+.DS_Store
+/cription
+/Activity__latest()-_first();
