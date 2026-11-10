@@ -24,6 +24,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'role_id' => fn () => \App\Models\Role::firstOrCreate(['nama' => 'employee'])->id,
+            'bidang_id' => fn () => \App\Models\Bidang::firstOrCreate(['nama_bidang' => 'Umum'])->id,
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),

@@ -1,5 +1,7 @@
 # Analisis implementasi SSO PDAM
 
+Catatan validasi terbaru **10 November 2026**: konfigurasi production terpisah, build Linux/amd64, pembaruan Composer/npm,100tes regresi dan drill backup–restore lokal telah selesai; lihat PRODUCTION_IMAGE_TESTS.md. Bagian audit/deployment bertanggal lama di bawah bersifat historis. Ini belum membuktikan deployment rootless atau proxy kantor.
+
 Diperbarui: **27 Oktober 2026**. Dokumen ini menggantikan rencana tahap awal dengan peta implementasi yang sudah ada. Daftar berikut menjelaskan kode saat ini; bukan pernyataan seluruh fitur siap production.
 
 Modul terbaru: **Pengarsipan CSR Humas**, dengan role/bidang Humas, kategori dari master Kategori Arsip Admin, lampiran privat, serta rekap Excel/PDF berdasarkan tanggal proses. Kolom Keluar diisi bebas oleh pengguna. Panduan penggunaan, pemasangan, struktur kode, dan pengujian tersedia di [HUMAS_CSR_MODULE.md](HUMAS_CSR_MODULE.md).
@@ -8,7 +10,7 @@ Modul terbaru: **Pengarsipan CSR Humas**, dengan role/bidang Humas, kategori dar
 
 | Aspek | Implementasi |
 |---|---|
-| Backend | Laravel 10, PHP `^8.1` menurut `composer.json` |
+| Backend | Laravel 12.71.0, PHP `^8.2`; dependency diperbarui untuk keamanan pada 9 November 2026 (lihat DEPENDENCY_SECURITY_UPDATE.md) |
 | PHP lingkungan | CLI lokal 8.3 pada pengujian terakhir; Dockerfile memakai `php:8.2-fpm` |
 | Autentikasi | Laravel Breeze, session, Blade |
 | Database | Konfigurasi MySQL; suite regresi terpilih memakai SQLite dalam memori |

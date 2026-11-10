@@ -32,6 +32,8 @@ class LaporanController extends Controller
 
     private function siapkanData($bulan, $tahun)
     {
+        $bulan = (int) $bulan;
+        $tahun = (int) $tahun;
         $awal = Carbon::create($tahun, $bulan, 1)->startOfMonth();
         $akhir = Carbon::create($tahun, $bulan, 1)->endOfMonth();
 

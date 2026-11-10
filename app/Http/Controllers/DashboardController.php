@@ -60,8 +60,8 @@ class DashboardController extends Controller
             'bulan' => 'nullable|integer|between:1,12',
             'tahun' => 'nullable|integer|between:1900,2100',
         ]);
-        $bulan = $request->bulan ?? now()->month;
-        $tahun = $request->tahun ?? now()->year;
+        $bulan = (int) ($request->bulan ?? now()->month);
+        $tahun = (int) ($request->tahun ?? now()->year);
 
         $awal = \Carbon\Carbon::create($tahun, $bulan, 1)->startOfMonth();
 

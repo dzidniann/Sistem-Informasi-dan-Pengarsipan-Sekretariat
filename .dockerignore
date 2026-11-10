@@ -20,3 +20,20 @@ Dockerfile
 docker-compose.yml
 
 /.dist
+/storage/app
+/storage/framework
+/storage/logs
+/bootstrap/cache/*.php
+/public/storage
+/public/hot
+/public/build
+/.secrets
+/backups
+/auth.json
+/tests
+**/.DS_Store
+**/*.sql
+**/*.sqlite
+**/*.sqlite3
+**/.env
+**/.env.*

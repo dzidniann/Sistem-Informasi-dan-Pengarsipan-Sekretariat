@@ -1,0 +1,91 @@
+name: ${COMPOSE_PROJECT_NAME:-simarta-office}
+x-build: &build
+  context: .
+  dockerfile: Dockerfile.production
+  args:
+    PHP_IMAGE: ${PHP_IMAGE:?Set approved PHP image}
+    NODE_IMAGE: ${NODE_IMAGE:?Set approved Node image}
+    COMPOSER_IMAGE: ${COMPOSER_IMAGE:?Set approved Composer image}
+    NGINX_IMAGE: ${NGINX_IMAGE:?Set approved Nginx image}
+x-app: &app
+  image: simarta-app:${RELEASE_TAG:?Set unique release tag}
+  build:
+    <<: *build
+    target: runtime
+  env_file: ${APP_ENV_FILE:-.env.production}
+  volumes:
+    - uploads:/var/www/html/storage
+  networks: [private]
+  restart: unless-stopped
+  security_opt: [no-new-privileges:true]
+  logging: &logging
+    driver: json-file
+    options: {max-size: "10m", max-file: "3"}
+services:
+  app:
+    <<: *app
+    depends_on:
+      db: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, php, docker/production/health.php]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  scheduler:
+    <<: *app
+    depends_on:
+      app: {condition: service_healthy}
+    command: [sh, -c, "while true; do php artisan schedule:run --no-interaction; touch /tmp/scheduler-heartbeat; sleep 60; done"]
+    healthcheck:
+      test: [CMD, php, -r, "exit(is_file('/tmp/scheduler-heartbeat') && time()-filemtime('/tmp/scheduler-heartbeat')<300 ? 0 : 1);"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+  webserver:
+    image: simarta-web:${RELEASE_TAG:?Set unique release tag}
+    build:
+      <<: *build
+      target: web
+    ports:
+      - "${WEB_BIND_IP:?Set IT-approved bind IP}:${WEB_PORT:?Set IT-approved unused port}:8080"
+    volumes:
+      - ./docker/nginx/trusted-proxies.conf:/etc/nginx/trusted-proxies.conf:ro
+      - ./docker/nginx/trusted-proto.map:/etc/nginx/trusted-proto.map:ro
+    networks: [private]
+    depends_on:
+      app: {condition: service_healthy}
+    restart: unless-stopped
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+    healthcheck:
+      test: [CMD-SHELL, "wget -q -O /dev/null http://127.0.0.1:8080/login || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  db:
+    image: ${MYSQL_IMAGE:?Set approved MySQL image}
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:?Set database}
+      MYSQL_USER: ${DB_USERNAME:?Set non-root application user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set application password}
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+    secrets: [mysql_root_password]
+    volumes: [database:/var/lib/mysql]
+    networks: [private]
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: [CMD-SHELL, "MYSQL_PWD=$$MYSQL_PASSWORD mysql --protocol=TCP -h 127.0.0.1 -u$$MYSQL_USER $$MYSQL_DATABASE -Nse 'SELECT 1' >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+networks:
+  private:
+    driver: bridge
+volumes:
+  database:
+  uploads:
+secrets:
+  mysql_root_password:
+    file: ${MYSQL_ROOT_SECRET_FILE:?Set root secret file path}
