@@ -37,7 +37,8 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Set kepemilikan folder storage dan bootstrap/cache agar bisa ditulis Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+RUN mkdir -p storage/app/protected-uploads storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 9000

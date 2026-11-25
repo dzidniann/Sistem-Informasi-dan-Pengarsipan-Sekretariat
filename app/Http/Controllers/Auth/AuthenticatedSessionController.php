@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
             match ($user->role->nama ?? '') {
                 'super-admin' => route('dashboard.admin'),
                 'sekretariat' => route('dashboard.sekretariat'),
-                'staf-bidang' => route('dashboard.staf'),
+                'staf-bidang' => route('employee.consultations.index'),
                 'legal-admin' => route('legal.dashboard'),
                 'humas' => route('humas.dashboard'),
                 'employee' => route('employee.consultations.index'),

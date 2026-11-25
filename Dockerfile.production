@@ -1,0 +1,48 @@
+# Release builds must supply approved tag@sha256 references; see DEPLOYMENT.md.
+ARG PHP_IMAGE=php:8.2.35-fpm-bookworm
+ARG NODE_IMAGE=node:22.14.0-bookworm-slim
+ARG COMPOSER_IMAGE=composer:2.8.6
+ARG NGINX_IMAGE=nginx:1.28.0-alpine
+FROM ${NODE_IMAGE} AS assets
+WORKDIR /build
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY vite.config.js tailwind.config.js postcss.config.js ./
+COPY resources ./resources
+RUN npm run build
+
+FROM ${COMPOSER_IMAGE} AS composer-bin
+FROM ${PHP_IMAGE} AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    unzip qpdf libpng-dev libonig-dev libxml2-dev libzip-dev \
+    libcurl4-openssl-dev libicu-dev libfreetype6-dev libjpeg62-turbo-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j2 pdo_mysql mbstring exif pcntl bcmath gd zip curl intl opcache \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=composer-bin /usr/bin/composer /usr/local/bin/composer
+WORKDIR /var/www/html
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts --no-autoloader
+COPY . .
+COPY --from=assets /build/public/build ./public/build
+COPY docker/php/production.ini /usr/local/etc/php/conf.d/zz-production.ini
+COPY docker/production/entrypoint.sh /usr/local/bin/simarta-entrypoint
+RUN mkdir -p storage/app/protected-uploads storage/framework/cache/data \
+    storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && composer dump-autoload --no-dev --optimize --no-interaction \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R u=rwX,g=rX,o= storage bootstrap/cache \
+    && chmod 755 /usr/local/bin/simarta-entrypoint
+USER www-data
+ENTRYPOINT ["simarta-entrypoint"]
+CMD ["php-fpm", "-F"]
+
+FROM ${NGINX_IMAGE} AS web
+RUN sed '/fastcgi_param[[:space:]]*REMOTE_ADDR/d' /etc/nginx/fastcgi_params > /etc/nginx/fastcgi_params.production
+COPY docker/nginx/production.conf /etc/nginx/nginx.conf
+COPY docker/nginx/trusted-proxies.conf /etc/nginx/trusted-proxies.conf
+COPY docker/nginx/trusted-proto.map /etc/nginx/trusted-proto.map
+COPY --from=runtime /var/www/html/public /var/www/html/public
+USER nginx
+ENTRYPOINT ["nginx"]
+CMD ["-g", "daemon off;"]

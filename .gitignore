@@ -32,6 +32,9 @@ yarn-error.log
 .env.*
 !.env.example
 !.env.docker.example
+!.env.production.example
+/.secrets/
+/backups/
 /.dist/
 /tmp/
 /.vs/

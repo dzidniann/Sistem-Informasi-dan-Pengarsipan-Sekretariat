@@ -33,7 +33,7 @@ class ProtectedUploadAccessTest extends TestCase
         }
     }
 
-    private function user(string $role = 'staf-bidang', ?Bidang $bidang = null): User
+    private function user(string $role = 'sekretariat', ?Bidang $bidang = null): User
     {
         return User::create([
             'name' => 'Petugas', 'email' => uniqid().'@example.test', 'password' => bcrypt('password'),
@@ -61,7 +61,7 @@ class ProtectedUploadAccessTest extends TestCase
     public function test_archive_download_requires_login_and_correct_bidang(): void
     {
         $owner = $this->user();
-        $peer = $this->user('staf-bidang', $owner->bidang);
+        $peer = $this->user('sekretariat', $owner->bidang);
         $outsider = $this->user();
         $category = KategoriArsip::create(['nama' => 'Arsip', 'bidang_id' => $owner->bidang_id]);
         Arsip::create(['judul_file' => 'Rahasia', 'tanggal' => today(), 'file_path' => 'arsip/a.pdf', 'kategori_id' => $category->id, 'bidang_id' => $owner->bidang_id, 'uploaded_by' => $owner->id]);
@@ -76,11 +76,12 @@ class ProtectedUploadAccessTest extends TestCase
     public function test_registration_controller_never_falls_back_to_super_admin(): void
     {
         $this->user('super-admin');
+        Role::where('nama', 'staf-bidang')->delete();
         config(['auth.allow_registration' => true]);
         $request = \Illuminate\Http\Request::create('/register', 'POST', ['name' => 'Tamu', 'email' => 'guest@example.test', 'password' => 'password', 'password_confirmation' => 'password']);
         try {
             app(\App\Http\Controllers\Auth\RegisteredUserController::class)->store($request);
-            $this->fail('Missing employee role must fail closed.');
+            $this->fail('Missing staff role must fail closed.');
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $error) {
             $this->assertSame(503, $error->getStatusCode());
         }
@@ -91,7 +92,7 @@ class ProtectedUploadAccessTest extends TestCase
     public function test_explicit_registration_cannot_activate_itself_or_choose_admin_role(): void
     {
         $admin = $this->user('super-admin');
-        $employee = Role::create(['nama' => 'employee']);
+        $employee = Role::firstOrCreate(['nama' => 'staf-bidang']);
         $umum = Bidang::create(['nama_bidang' => 'Umum']);
         config(['auth.allow_registration' => true]);
         $request = \Illuminate\Http\Request::create('/register', 'POST', ['name' => 'Tamu', 'email' => 'guest@example.test', 'password' => 'password', 'password_confirmation' => 'password', 'role_id' => $admin->role_id, 'bidang_id' => $admin->bidang_id, 'is_active' => true]);
@@ -126,7 +127,7 @@ class ProtectedUploadAccessTest extends TestCase
         $private->save();
         $publicUrl = $this->file($published->file_path);
         $privateUrl = $this->file($private->file_path);
-        $reader = $this->user('employee');
+        $reader = $this->user('staf-bidang');
         $this->actingAs($reader)->get($publicUrl)->assertOk();
         $this->get($privateUrl)->assertNotFound();
         DB::table('legal_documents')->where('id', $published->id)->update(['expiry_date' => today()->subDay()->toDateString(), 'status' => 'ACTIVE']);
@@ -137,8 +138,8 @@ class ProtectedUploadAccessTest extends TestCase
 
     public function test_consultation_and_message_files_are_not_shared_with_other_employees(): void
     {
-        $owner = $this->user('employee');
-        $outsider = $this->user('employee', $owner->bidang);
+        $owner = $this->user('staf-bidang');
+        $outsider = $this->user('staf-bidang', $owner->bidang);
         $legal = $this->user('legal-admin');
         $consultation = Consultation::create(['user_id' => $owner->id, 'title' => 'Konsultasi', 'description' => 'Privat', 'attachment' => 'consultations/a.pdf', 'status' => 'WAITING_REVIEW']);
         ConsultationMessage::create(['consultation_id' => $consultation->id, 'user_id' => $legal->id, 'message' => 'Balasan', 'attachment' => 'consultation-messages/a.pdf']);

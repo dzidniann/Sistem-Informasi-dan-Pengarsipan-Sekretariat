@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Arsip;
 use App\Models\KategoriArsip;
+use App\Models\User;
 use App\Services\NamedUploads;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,8 @@ class ArsipController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+        /** @var User $user */
+        $user = $request->user();
         $query = Arsip::with(['kategori', 'bidang']);
 
         $cakupanSendiri = $user->hasRole('sekretariat') || $request->cakupan === 'sendiri';
@@ -41,7 +43,8 @@ class ArsipController extends Controller
 
     public function store(Request $request)
     {
-        $user = auth()->user();
+        /** @var User $user */
+        $user = $request->user();
 
         $request->validate([
             'judul_file' => 'required|string|max:255',
@@ -69,9 +72,10 @@ class ArsipController extends Controller
         return back()->with('success', 'Berkas berhasil diunggah');
     }
 
-    public function show(Arsip $arsip)
+    public function show(Request $request, Arsip $arsip)
     {
-        $user = auth()->user();
+        /** @var User $user */
+        $user = $request->user();
 
         abort_unless($user->bisaAksesSemuaBidang() || $user->bidang_id === $arsip->bidang_id, 403);
 

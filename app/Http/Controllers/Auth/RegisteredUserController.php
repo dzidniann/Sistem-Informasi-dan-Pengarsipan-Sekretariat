@@ -37,15 +37,15 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $employeeRole = \App\Models\Role::where('nama', 'employee')->first();
+        $staffRole = \App\Models\Role::where('nama', 'staf-bidang')->first();
         $bidangUmum = \App\Models\Bidang::where('nama_bidang', 'Umum')->first();
-        abort_unless($employeeRole && $bidangUmum, 503, 'Pendaftaran belum dikonfigurasi.');
+        abort_unless($staffRole && $bidangUmum, 503, 'Pendaftaran belum dikonfigurasi.');
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => $employeeRole?->id,
+            'role_id' => $staffRole?->id,
             'bidang_id' => $bidangUmum?->id,
             'is_active' => false,
         ]);

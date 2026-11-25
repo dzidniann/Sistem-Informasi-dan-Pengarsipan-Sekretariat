@@ -1,5 +1,7 @@
 # Analisis implementasi SSO PDAM
 
+Catatan validasi terbaru **10 November 2026**: konfigurasi production terpisah, build Linux/amd64, pembaruan Composer/npm,100tes regresi dan drill backup–restore lokal telah selesai; lihat PRODUCTION_IMAGE_TESTS.md. Bagian audit/deployment bertanggal lama di bawah bersifat historis. Ini belum membuktikan deployment rootless atau proxy kantor.
+
 Diperbarui: **27 Oktober 2026**. Dokumen ini menggantikan rencana tahap awal dengan peta implementasi yang sudah ada. Daftar berikut menjelaskan kode saat ini; bukan pernyataan seluruh fitur siap production.
 
 Modul terbaru: **Pengarsipan CSR Humas**, dengan role/bidang Humas, kategori dari master Kategori Arsip Admin, lampiran privat, serta rekap Excel/PDF berdasarkan tanggal proses. Kolom Keluar diisi bebas oleh pengguna. Panduan penggunaan, pemasangan, struktur kode, dan pengujian tersedia di [HUMAS_CSR_MODULE.md](HUMAS_CSR_MODULE.md).
@@ -8,7 +10,7 @@ Modul terbaru: **Pengarsipan CSR Humas**, dengan role/bidang Humas, kategori dar
 
 | Aspek | Implementasi |
 |---|---|
-| Backend | Laravel 10, PHP `^8.1` menurut `composer.json` |
+| Backend | Laravel 12.71.0, PHP `^8.2`; dependency diperbarui untuk keamanan pada 9 November 2026 (lihat DEPENDENCY_SECURITY_UPDATE.md) |
 | PHP lingkungan | CLI lokal 8.3 pada pengujian terakhir; Dockerfile memakai `php:8.2-fpm` |
 | Autentikasi | Laravel Breeze, session, Blade |
 | Database | Konfigurasi MySQL; suite regresi terpilih memakai SQLite dalam memori |
@@ -48,10 +50,9 @@ Tidak ada lagi controller `LegalReportController` maupun view `legal/reports/ind
 |---|---|---|
 | `super-admin` | `/admin` | Bidang, kategori arsip/surat, pengguna, role, seluruh log |
 | `sekretariat` | `/dashboard-sekretariat` | Arsip, nomor surat, notulensi dan laporan Sekretariat, portal konsultasi/perpustakaan |
-| `staf-bidang` | `/staf` | Arsip bidang, upload, log sendiri, konsultasi sendiri, perpustakaan |
+| `staf-bidang` | `/employee/consultations` | Konsultasi milik sendiri dan perpustakaan dokumen terpublikasi |
 | `legal-admin` | `/legal/dashboard` | Dokumen Hukum, konsultasi, kalender, kegiatan/notulensi, laporan, perpustakaan |
 | `humas` | `/humas/dashboard` | Arsip CSR bidang sendiri, rekap Excel/PDF, log sendiri, konsultasi dan perpustakaan |
-| `employee` | `/employee/consultations` | Konsultasi sendiri dan perpustakaan |
 
 `AuthenticatedSessionController::store()` memakai `redirect()->intended(...)`; intended URL dapat mendahului tujuan default. `/` mengarahkan ke login. `RouteServiceProvider::HOME` tetap `/dashboard`; jangan menganggap konstanta itu sebagai seluruh logika redirect login.
 
@@ -59,7 +60,7 @@ Nama organisasi sekarang **Sub Bidang Hukum**. Penggantian nama tidak mengubah r
 
 Antarmuka Admin tidak menampilkan pintasan Hukum/Perpustakaan. Portal Perpustakaan dan konsultasi memilih layout menurut role sehingga sidebar asal tetap terlihat. Kontrol hamburger bersama berada di `layouts/sidebar-controls-style.blade.php`, sedangkan layout Legal memiliki aturan setara sendiri. Tombol hamburger 42 × 42 px, dekat tepi sidebar, dengan drawer pada viewport maksimal 980 px.
 
-Log Aktivitas hanya memberi seluruh log kepada Super Admin; role lainnya hanya causer akun sendiri, termasuk pencarian/pagination/detail. Kesamaan role atau bidang tidak memberi hak melihat log akun lain.
+Pembaruan25November2026: akun role employee dipindahkan ke staf-bidang oleh migration2026_11_25_100000, lalu role employee dihapus. Staf hanya memakai konsultasi dan perpustakaan, dengan pembatasan arsip, upload arsip dan log aktivitas pada backend. Flag akses semua bidang tetap tidak memberi akses arsip kepada staf. URL konsultasi lama dipertahankan. Super Admin melihat seluruh log; Sekretariat, Humas dan Legal melihat log akun sendiri.
 
 Keterbatasan yang masih ada: `RoleMiddleware::handle()` menerima satu argumen `$role`. Deklarasi `role:legal-admin,super-admin` belum memberikan akses role kedua sesuai maksud. Kegiatan/notulensi/laporan Legal memakai `LegalModuleAccess` khusus untuk kedua role; route Legal lama belum seluruhnya selaras. Akses konsultasi pada controller juga masih membedakan khusus `hasRole('legal-admin')`. Lihat A08 dalam [audit](AUDIT_SISTEM_2026-10-16.md).
 

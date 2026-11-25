@@ -164,22 +164,16 @@ class SecretariatArchiveAccessTest extends TestCase
         $this->get(route('laporan.pdf', $params))->assertOk();
     }
 
-    public function test_summary_requires_login_and_other_roles_keep_existing_archive_scope(): void
+    public function test_summary_and_archives_remain_unavailable_to_staff_with_a_cross_field_flag(): void
     {
         $this->getJson(route('dashboard.rekap-bulanan'))->assertUnauthorized();
         $data = $this->fixtures();
         $this->actingAs($data['staff'])
-            ->getJson(route('dashboard.rekap-bulanan'))
-            ->assertOk()
-            ->assertJsonPath('totalKeseluruhan', 1)
-            ->assertJsonPath('rekap.0.bidang', $data['other']->nama_bidang);
-        $this->getJson(route('dashboard.rekap-bulanan', ['bulan' => 13]))->assertUnprocessable();
+            ->getJson(route('dashboard.rekap-bulanan'))->assertForbidden();
         $data['other']->update(['akses_semua_bidang' => true]);
         $staff = $data['staff']->fresh();
-        $this->assertTrue($staff->bisaAksesSemuaBidang());
-        $this->actingAs($staff)
-            ->get(route('arsip.index'))
-            ->assertOk()
-            ->assertViewHas('arsip', fn ($records) => $records->total() === 2);
+        $this->assertFalse($staff->bisaAksesSemuaBidang());
+        $this->actingAs($staff)->get(route('arsip.index'))->assertForbidden();
+        $this->assertSame(0, Arsip::visibleTo($staff)->count());
     }
 }

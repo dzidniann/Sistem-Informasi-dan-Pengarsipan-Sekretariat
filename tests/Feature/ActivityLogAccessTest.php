@@ -34,7 +34,7 @@ class ActivityLogAccessTest extends TestCase
         }
     }
 
-    private function user(string $role = 'staf-bidang', string $bidang = 'Kepegawaian'): User
+    private function user(string $role = 'sekretariat', string $bidang = 'Kepegawaian'): User
     {
         return User::create([
             'name' => uniqid('Pengguna '),
@@ -50,7 +50,7 @@ class ActivityLogAccessTest extends TestCase
     {
         $user = $this->user();
         $peer = $this->user();
-        $otherDepartment = $this->user('staf-bidang', 'Teknik');
+        $otherDepartment = $this->user('sekretariat', 'Teknik');
         $own = activity()->causedBy($user)->log('Aktivitas milik sendiri');
         $foreign = activity()->causedBy($peer)->log('Aktivitas rekan satu bidang');
         $other = activity()->causedBy($otherDepartment)->log('Aktivitas bidang lain');
@@ -94,7 +94,7 @@ class ActivityLogAccessTest extends TestCase
 
     public function test_other_non_admin_roles_also_cannot_open_peer_logs(): void
     {
-        foreach (['sekretariat', 'legal-admin', 'employee'] as $role) {
+        foreach (['sekretariat', 'legal-admin', 'humas'] as $role) {
             auth()->logout();
             $user = $this->user($role);
             $peer = $this->user($role);

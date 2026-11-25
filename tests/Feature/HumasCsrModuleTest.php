@@ -177,7 +177,7 @@ class HumasCsrModuleTest extends TestCase
             route('humas.reports.excel', ['tahun' => 2026, 'kategori_id' => $csr->kategori_id]),
         )->assertSessionHasErrors('kategori_id');
         $this->actingAs($owner)->get(route('humas.csr.attachment', [$csr, $attachment]))->assertNotFound();
-        foreach (['staf-bidang', 'sekretariat', 'legal-admin', 'employee', 'super-admin'] as $role) {
+        foreach (['staf-bidang', 'sekretariat', 'legal-admin', 'super-admin'] as $role) {
             $this->actingAs($this->user($role))->get(route('humas.csr.index'))->assertForbidden();
         }
         auth()->logout();

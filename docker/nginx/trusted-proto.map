@@ -1,0 +1,3 @@
+# Add ONLY a verified exact peer IP observed by this Nginx, approved by IT:
+# 192.0.2.10 $http_x_forwarded_proto;
+# NPM must overwrite X-Forwarded-Proto. Never add a broad subnet/default trust.

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Consultation;
 use App\Models\ConsultationMessage;
 use App\Models\LegalNotification;
+use App\Models\User;
 use App\Services\NamedUploads;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,8 @@ class ConsultationController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth()->user();
+        /** @var User $user */
+        $user = $request->user();
         $isLegalAdmin = $user->hasRole('legal-admin');
 
         $query = Consultation::with(['user', 'assignedLegal']);
@@ -69,7 +71,8 @@ class ConsultationController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
+        /** @var User $user */
+        $user = $request->user();
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -110,9 +113,10 @@ class ConsultationController extends Controller
     /**
      * Detail konsultasi + diskusi
      */
-    public function show(Consultation $consultation)
+    public function show(Request $request, Consultation $consultation)
     {
-        $user = auth()->user();
+        /** @var User $user */
+        $user = $request->user();
         $isLegalAdmin = $user->hasRole('legal-admin');
 
         // Employee hanya bisa lihat konsultasi sendiri
@@ -133,7 +137,8 @@ class ConsultationController extends Controller
      */
     public function sendMessage(Request $request, Consultation $consultation)
     {
-        $user = auth()->user();
+        /** @var User $user */
+        $user = $request->user();
         $isLegalAdmin = $user->hasRole('legal-admin');
 
         // Employee hanya bisa kirim pesan di konsultasi sendiri
