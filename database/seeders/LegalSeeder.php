@@ -15,10 +15,10 @@ class LegalSeeder extends Seeder
      * Seed data untuk modul Legal Management System.
      *
      * Menambahkan:
-     * - 2 role baru: legal-admin, employee
+     * - 2 role baru: legal-admin, staf-bidang
      * - 1 bidang baru: Sub Bidang Hukum
      * Kategori dokumen diisi admin melalui Kategori Arsip bidang Sub Bidang Hukum.
-     * - User sampel legal-admin dan employee
+     * - User sampel legal-admin dan staf-bidang
      */
     public function run(): void
     {
@@ -33,9 +33,9 @@ class LegalSeeder extends Seeder
             ]);
         }
 
-        if (!in_array('employee', $existingRoles)) {
+        if (!in_array('staf-bidang', $existingRoles)) {
             DB::table('roles')->insert([
-                'nama' => 'employee',
+                'nama' => 'staf-bidang',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -53,7 +53,7 @@ class LegalSeeder extends Seeder
             ]);
         }
 
-        // Bidang Umum untuk employee default
+        // Bidang Umum untuk staf-bidang default
         $existingUmum = Bidang::where('nama_bidang', 'Umum')->first();
 
         if (!$existingUmum) {
@@ -67,7 +67,7 @@ class LegalSeeder extends Seeder
 
         // ===== User Sampel =====
         $legalAdmin = Role::where('nama', 'legal-admin')->first();
-        $employeeRole = Role::where('nama', 'employee')->first();
+        $staffRole = Role::where('nama', 'staf-bidang')->first();
         $bidangHukum = Bidang::whereIn('nama_bidang', ['Sub Bidang Hukum', 'Divisi Hukum'])->first();
         $bidangUmum = Bidang::where('nama_bidang', 'Umum')->first();
 
@@ -85,14 +85,14 @@ class LegalSeeder extends Seeder
             }
         }
 
-        if ($employeeRole && $bidangUmum) {
-            $existingEmployee = User::where('email', 'pegawai@instansi.go.id')->first();
-            if (!$existingEmployee) {
+        if ($staffRole && $bidangUmum) {
+            $existingStaff = User::where('email', 'pegawai@instansi.go.id')->first();
+            if (!$existingStaff) {
                 User::create([
                     'name' => 'Pegawai Umum',
                     'email' => 'pegawai@instansi.go.id',
                     'password' => Hash::make('password123'),
-                    'role_id' => $employeeRole->id,
+                    'role_id' => $staffRole->id,
                     'bidang_id' => $bidangUmum->id,
                     'is_active' => true,
                 ]);

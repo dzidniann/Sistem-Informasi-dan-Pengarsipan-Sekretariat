@@ -134,7 +134,7 @@ class LegalGovernanceDocumentTest extends TestCase
     {
         $this->actingAs($this->user('legal-admin'))->post(route('legal.governance-documents.store'), $this->payload())->assertSessionHasNoErrors();
         $document = LegalGovernanceDocument::sole();
-        foreach (['humas', 'staf-bidang', 'sekretariat', 'employee'] as $role) {
+        foreach (['humas', 'staf-bidang', 'sekretariat'] as $role) {
             $this->actingAs($this->user($role));
             $this->get(route('legal.governance-documents.index'))->assertForbidden();
             $this->get(route('legal.governance-documents.show', $document))->assertForbidden();

@@ -523,12 +523,8 @@
                         <img src="{{ asset('images/logo-icon-badge.png') }}" alt="Logo" style="height: 40px;">
                         <p class="sidebar-title" style="margin:0;">Staf Bidang Navigation</p>
                     </div>
-                    <a href="{{ route('dashboard.staf') }}" class="nav-link {{ Request::routeIs('dashboard.staf') ? 'active' : '' }}">Dashboard</a>
-                    <a href="{{ route('arsip.index') }}" class="nav-link {{ Request::routeIs('arsip.*') ? 'active' : '' }}">Upload Berkas</a>
-                    <a href="{{ route('arsip.index') }}" class="nav-link">Arsip Bidang</a>
-                    <a href="{{ route('log-aktivitas.index') }}" class="nav-link {{ Request::routeIs('log-aktivitas.*') ? 'active' : '' }}">Log Aktivitas</a>
-                    <a href="{{ route('employee.consultations.index') }}" class="nav-link {{ Request::routeIs('employee.consultations.*') ? 'active' : '' }}">Konsultasi
-                        Hukum</a>
+                    <a href="{{ route('employee.consultations.index') }}" class="nav-link {{ Request::routeIs('employee.consultations.index', 'employee.consultations.show') ? 'active' : '' }}">Konsultasi Hukum</a>
+                    <a href="{{ route('employee.consultations.create') }}" class="nav-link {{ Request::routeIs('employee.consultations.create') ? 'active' : '' }}">Ajukan Konsultasi</a>
                     <a href="{{ route('library.index') }}" class="nav-link {{ Request::routeIs('library.*') ? 'active' : '' }}">Perpustakaan</a>
                     <div class="sidebar-footer">
                         <form method="POST" action="{{ route('logout') }}">

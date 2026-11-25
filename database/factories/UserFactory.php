@@ -24,13 +24,14 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'role_id' => fn () => \App\Models\Role::firstOrCreate(['nama' => 'employee'])->id,
+            'role_id' => fn () => \App\Models\Role::firstOrCreate(['nama' => 'staf-bidang'])->id,
             'bidang_id' => fn () => \App\Models\Bidang::firstOrCreate(['nama_bidang' => 'Umum'])->id,
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => (static::$password ??= Hash::make('password')),
             'remember_token' => Str::random(10),
+            'is_active' => true,
         ];
     }
 

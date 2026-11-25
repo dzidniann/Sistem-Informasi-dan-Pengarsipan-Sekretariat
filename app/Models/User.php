@@ -38,7 +38,7 @@ class User extends Authenticatable
 
     public function bisaAksesSemuaBidang(): bool
     {
-        if (in_array($this->role?->nama, ['sekretariat', 'humas'], true)) {
+        if (in_array($this->role?->nama, ['sekretariat', 'humas', 'staf-bidang', 'employee'], true)) {
             return false;
         }
 

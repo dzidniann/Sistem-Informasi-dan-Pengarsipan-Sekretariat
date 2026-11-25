@@ -23,6 +23,10 @@ Route::get('/', function () {
 })->name('welcome');
 
 Route::get('/dashboard', function () {
+    if (in_array(request()->user()->role?->nama, ['staf-bidang', 'employee'], true)) {
+        return redirect()->route('employee.consultations.index');
+    }
+
     return view('dashboard');
 })
     ->middleware(['auth', 'verified'])

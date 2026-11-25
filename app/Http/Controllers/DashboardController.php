@@ -51,7 +51,7 @@ class DashboardController extends Controller
 
     public function staf()
     {
-        return view('staf.dashboard');
+        return redirect()->route('employee.consultations.index');
     }
 
     public function rekapBulanan(Request $request)

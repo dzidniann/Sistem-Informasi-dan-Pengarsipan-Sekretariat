@@ -7,13 +7,14 @@ use App\Models\Role;
 use App\Models\Bidang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     public function index()
     {
         $users = User::with(['role', 'bidang'])->get();
-        $roles = Role::all();
+        $roles = Role::where('nama', '!=', 'employee')->get();
         $bidangList = Bidang::all();
 
         return view('admin.pengguna.index', compact('users', 'roles', 'bidangList'));
@@ -25,7 +26,7 @@ class UserController extends Controller
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8',
-            'role_id' => 'required|exists:roles,id',
+            'role_id' => ['required', Rule::exists('roles', 'id')->whereNot('nama', 'employee')],
             'bidang_id' => 'required|exists:bidangs,id',
         ]);
 
@@ -46,7 +47,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role_id' => 'required|exists:roles,id',
+            'role_id' => ['required', Rule::exists('roles', 'id')->whereNot('nama', 'employee')],
             'bidang_id' => 'required|exists:bidangs,id',
         ]);
 
@@ -66,7 +67,7 @@ class UserController extends Controller
 
     public function role()
     {
-        $roles = Role::withCount('users')->get();
+        $roles = Role::where('nama', '!=', 'employee')->withCount('users')->get();
 
         return view('admin.role.index', compact('roles'));
     }

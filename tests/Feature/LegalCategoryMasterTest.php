@@ -230,9 +230,8 @@ class LegalCategoryMasterTest extends TestCase
         foreach (
             [
                 'sekretariat' => 'dashboard.sekretariat',
-                'staf-bidang' => 'dashboard.staf',
+                'staf-bidang' => 'employee.consultations.index',
                 'super-admin' => 'dashboard.admin',
-                'employee' => null,
             ] as $role => $dashboard
         ) {
             $user = $this->user($role);
@@ -339,8 +338,7 @@ class LegalCategoryMasterTest extends TestCase
         $dashboards = [
             'legal-admin' => 'legal.dashboard',
             'sekretariat' => 'dashboard.sekretariat',
-            'staf-bidang' => 'dashboard.staf',
-            'employee' => 'employee.consultations.index',
+            'staf-bidang' => 'employee.consultations.index',
             'super-admin' => 'dashboard.admin',
         ];
         foreach ($dashboards as $role => $dashboard) {

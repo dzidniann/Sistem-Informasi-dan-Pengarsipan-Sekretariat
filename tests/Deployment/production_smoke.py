@@ -34,7 +34,7 @@ def php(code):
 
 
 php(r"""
-foreach(['super-admin','sekretariat','staf-bidang','legal-admin','humas','employee'] as $name){
+foreach(['super-admin','sekretariat','staf-bidang','legal-admin','humas'] as $name){
  $role=App\Models\Role::firstOrCreate(['nama'=>$name]);
  $bidang=App\Models\Bidang::firstOrCreate(['nama_bidang'=>$name==='sekretariat'?'Sekretariat dan Pengarsipan':$name]);
  App\Models\User::updateOrCreate(['email'=>$name.'@smoke.invalid'],['name'=>'Smoke '.$name,'password'=>bcrypt(getenv('SMOKE_PASSWORD')),'role_id'=>$role->id,'bidang_id'=>$bidang->id,'is_active'=>true]);
@@ -100,7 +100,7 @@ print('PASS production CSS/JS assets served without Vite dev server')
 assert guest.request("/register")[0] == 404
 assert guest.request("/storage/private-probe.pdf")[0] == 302
 assert guest.request("/.env")[0] in (403, 404)
-for role in ("super-admin", "sekretariat", "staf-bidang", "legal-admin", "humas", "employee"):
+for role in ("super-admin", "sekretariat", "staf-bidang", "legal-admin", "humas"):
     Client().login(role)
 
 # Generate a real PDF using the shipped PDF engine, not a user's document.

@@ -61,7 +61,6 @@ class LogAktivitasController extends Controller
             'sekretariat' => 'sekretariat.layout',
             'humas' => 'humas.layout',
             'legal-admin' => 'legal.layout',
-            'employee' => 'employee.layout',
             default => 'staf.layout',
         };
     }

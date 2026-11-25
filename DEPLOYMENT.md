@@ -104,17 +104,17 @@ Sebelum release, pin PHP_IMAGE/NODE_IMAGE/COMPOSER_IMAGE/NGINX_IMAGE/MYSQL_IMAGE
 
 ## 4. Database, data awal, dan migration
 
-Sebelum `up`, setelah port/bind disetujui, buat HANYA network project agar alokasinya dapat diperiksa (langkah manual di server, bukan dijalankan Codex):
+Sebelum `up`, setelah port/bind disetujui, buat resource project tanpa menjalankan service agar alokasi network dapat diperiksa (langkah manual di server, bukan dijalankan Codex):
 
 ```bash
-dc create --no-deps webserver
+dc create --no-build webserver
 docker --context rootless network ls --filter label=com.docker.compose.project=simarta-office
 docker --context rootless network inspect simarta-office_private --format '{{json .IPAM.Config}}'
 ip -4 route show table all
 ip -6 route show table all
 ```
 
-Ganti nama project pada filter/nama network jika COMPOSE_PROJECT_NAME diubah. `create` membuat container Nginx berstatus stopped beserta network dan dapat membuat resource project; tidak memulai listener. Jangan `start/up` jika alokasi tumpang tindih atau belum dicek IT. Jika Docker gagal mengalokasikan pool, laporkan dan minta alokasi resmi; jangan edit rootless daemon/default-address-pools sendiri. Membuat network tidak mengubah layanan kantor lain, tetapi tetap lakukan hanya pada jadwal dan project yang disepakati.
+Ganti nama project pada filter/nama network jika COMPOSE_PROJECT_NAME diubah. `create` membuat container Nginx beserta dependency app/database dalam keadaan stopped, network dan volume project; dapat mengunduh image dependency yang belum tersedia, tetapi tidak menjalankan service atau listener. Opsi --no-deps tidak didukung oleh compose create. Jangan `start/up` jika alokasi tumpang tindih atau belum dicek IT. Jika Docker gagal mengalokasikan pool, laporkan dan minta alokasi resmi; jangan edit rootless daemon/default-address-pools sendiri. Membuat network tidak mengubah layanan kantor lain, tetapi tetap lakukan hanya pada jadwal dan project yang disepakati.
 
 ```bash
 dc up -d db

@@ -1,5 +1,9 @@
 # Panduan modul Sub Bidang Hukum
 
+Pembaruan25November2026: role pemohon adalah staf-bidang, dengan menu konsultasi dan perpustakaan. Migration2026_11_25_100000 memindahkan akun employee ke staf-bidang dan menghapus role lama. ID akun, password, bidang dan riwayat konsultasi tetap disimpan. URL /employee/consultations dipertahankan untuk tautan lama. Staf tidak memperoleh akses arsip atau log aktivitas.
+
+Deployment perubahan role memerlukan backup, build image baru dan `php artisan migrate --force` saat penulis data dihentikan. Migration penggabungan role tidak mendukung rollback otomatis karena penugasan role asal tidak lagi dapat ditentukan dari data hasil gabungan; pemulihan memerlukan backup. Seeder penuh tidak diperlukan.
+
 Diperbarui: **20 Oktober 2026**. Dokumen ini menjelaskan implementasi sekarang, menggantikan panduan awal yang masih menyertakan statistik laporan dan lampiran notulensi dalam PDF bulanan.
 
 ## Cakupan dan berkas utama

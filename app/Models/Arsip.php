@@ -23,6 +23,10 @@ class Arsip extends Model
 
     public function scopeVisibleTo($query, User $user)
     {
+        if (in_array($user->role?->nama, ['staf-bidang', 'employee'], true)) {
+            return $query->whereRaw('1 = 0');
+        }
+
         return $user->bisaAksesSemuaBidang() ? $query : $query->where('bidang_id', $user->bidang_id);
     }
 

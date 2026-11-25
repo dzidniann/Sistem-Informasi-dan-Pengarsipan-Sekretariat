@@ -5,7 +5,7 @@
         'humas' => 'humas.layout',
         'staf-bidang' => 'staf.layout',
         'super-admin' => 'admin.layout',
-        default => 'employee.layout'
+        default => 'staf.layout'
     }
 )
 
